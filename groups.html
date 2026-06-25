@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2026 FIFA World Cup — Group Stage</title>
+  <style>
+    :root {
+      --navy: #003277;
+      --blue: #0070F4;
+      --gold: #E8C21A;
+      --gray: #4A5567;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: linear-gradient(135deg, #003277 0%, #0058C7 50%, #0176FF 100%);
+      min-height: 100vh;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #fff;
+    }
+
+    header {
+      background: var(--navy);
+      padding: 14px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .header-left h1 {
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .header-left .subtitle {
+      font-size: 0.75rem;
+      color: var(--gold);
+      margin-top: 2px;
+      font-weight: 500;
+    }
+
+    .nav-btn {
+      background: var(--gold);
+      color: var(--navy);
+      border: none;
+      padding: 9px 18px;
+      border-radius: 6px;
+      font-weight: 800;
+      font-size: 0.82rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-block;
+      letter-spacing: 0.3px;
+      transition: background 0.15s;
+    }
+
+    .nav-btn:hover { background: #f5d020; }
+
+    .legend {
+      display: flex;
+      gap: 20px;
+      padding: 10px 24px;
+      background: rgba(0,0,0,0.25);
+      font-size: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .dot-green  { background: #22c55e; }
+    .dot-red    { background: #ef4444; }
+    .dot-neutral { background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.4); }
+
+    .container {
+      padding: 24px;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+
+    .groups-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 18px;
+    }
+
+    .group-card {
+      background: var(--navy);
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.35);
+    }
+
+    .group-header {
+      background: rgba(0,0,0,0.35);
+      padding: 9px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+    }
+
+    .group-title {
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 1.5px;
+      color: var(--gold);
+    }
+
+    .group-meta {
+      font-size: 0.68rem;
+      color: rgba(255,255,255,0.45);
+      font-weight: 500;
+    }
+
+    .badge-final {
+      background: rgba(232,194,26,0.2);
+      color: var(--gold);
+      border: 1px solid rgba(232,194,26,0.4);
+      font-size: 0.62rem;
+      font-weight: 800;
+      padding: 2px 6px;
+      border-radius: 3px;
+      letter-spacing: 0.5px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    thead th {
+      background: rgba(0,0,0,0.2);
+      padding: 5px 7px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--gray);
+      text-align: right;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      letter-spacing: 0.3px;
+    }
+
+    thead th:first-child {
+      text-align: left;
+      padding-left: 14px;
+    }
+
+    tbody tr.data-row td {
+      padding: 8px 7px;
+      font-size: 0.81rem;
+      text-align: right;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    tbody tr.data-row td:first-child {
+      text-align: left;
+      padding-left: 14px;
+    }
+
+    .team-cell {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .team-flag { font-size: 1.05rem; line-height: 1; }
+
+    .team-name {
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .status-badge {
+      display: inline-block;
+      font-size: 0.58rem;
+      font-weight: 800;
+      padding: 2px 4px;
+      border-radius: 3px;
+      margin-left: 4px;
+      vertical-align: middle;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-in {
+      background: rgba(34,197,94,0.2);
+      color: #4ade80;
+      border: 1px solid rgba(34,197,94,0.4);
+    }
+
+    .badge-out {
+      background: rgba(239,68,68,0.2);
+      color: #f87171;
+      border: 1px solid rgba(239,68,68,0.4);
+    }
+
+    /* Row status colors */
+    tr.row-qualified td { background: rgba(34,197,94,0.09); }
+    tr.row-qualified .team-name { color: #4ade80; }
+
+    tr.row-eliminated td { background: rgba(239,68,68,0.08); }
+    tr.row-eliminated .team-name {
+      color: #f87171;
+    }
+
+    /* GD colors */
+    .gd-pos { color: #4ade80; }
+    .gd-neg { color: #f87171; }
+
+    /* Pts column */
+    .pts-cell { font-weight: 700; color: var(--gold); padding-right: 28px !important; }
+    thead th:last-child { padding-right: 28px; }
+
+    /* Advancement note row */
+    tr.note-row td {
+      padding: 3px 14px 7px 36px;
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.45;
+      background: rgba(0,0,0,0.18);
+      text-align: left;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+
+    tr.note-row:last-child td { border-bottom: none; }
+    tr.data-row:last-child td { border-bottom: none; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>2026 FIFA WORLD CUP</h1>
+    <div class="subtitle">Group Stage Standings &nbsp;·&nbsp; Updated Jun 25, 2026</div>
+  </div>
+  <a href="bracket.html" class="nav-btn">View Bracket →</a>
+</header>
+
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot dot-green"></div> Qualified for Round of 32</div>
+  <div class="legend-item"><div class="legend-dot dot-red"></div> Eliminated</div>
+  <div class="legend-item"><div class="legend-dot dot-neutral"></div> Still in contention</div>
+</div>
+
+<div class="container">
+  <div class="groups-grid" id="groups-container"></div>
+</div>
+
+<script>
+const groups = [
+  {
+    name: "A", finalGame: "Jun 24", complete: true,
+    teams: [
+      { flag:"🇲🇽", name:"Mexico", gp:3, w:3, d:0, l:0, f:6, a:0, gd:"+6", pts:9, status:"qualified" },
+      { flag:"🇿🇦", name:"South Africa", gp:3, w:1, d:1, l:1, f:2, a:3, gd:"-1", pts:4, status:"qualified" },
+      { flag:"🇰🇷", name:"South Korea", gp:3, w:1, d:0, l:2, f:2, a:3, gd:"-1", pts:3, status:"alive",
+        note:"Finished 3rd. Advances only if among the 8 best 3rd-place teams — unlikely at 3pts, GD (-1)." },
+      { flag:"🇨🇿", name:"Czechia", gp:3, w:0, d:1, l:2, f:2, a:6, gd:"-4", pts:1, status:"eliminated" }
+    ]
+  },
+  {
+    name: "B", finalGame: "Jun 24", complete: true,
+    teams: [
+      { flag:"🇨🇭", name:"Switzerland", gp:3, w:2, d:1, l:0, f:7, a:3, gd:"+4", pts:7, status:"qualified" },
+      { flag:"🇨🇦", name:"Canada", gp:3, w:1, d:1, l:1, f:8, a:3, gd:"+5", pts:4, status:"qualified" },
+      { flag:"🇧🇦", name:"Bosnia-Herzegovina", gp:3, w:1, d:1, l:1, f:5, a:6, gd:"-1", pts:4, status:"alive",
+        note:"Finished 3rd. Advances if among the 8 best 3rd-place teams (ranked by pts, then GD)." },
+      { flag:"🇶🇦", name:"Qatar", gp:3, w:0, d:1, l:2, f:2, a:10, gd:"-8", pts:1, status:"eliminated" }
+    ]
+  },
+  {
+    name: "C", finalGame: "Jun 24", complete: true,
+    teams: [
+      { flag:"🇧🇷", name:"Brazil", gp:3, w:2, d:1, l:0, f:7, a:1, gd:"+6", pts:7, status:"qualified" },
+      { flag:"🇲🇦", name:"Morocco", gp:3, w:2, d:1, l:0, f:6, a:3, gd:"+3", pts:7, status:"qualified" },
+      { flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿", name:"Scotland", gp:3, w:1, d:0, l:2, f:1, a:4, gd:"-3", pts:3, status:"alive",
+        note:"Finished 3rd. Advances if among the 8 best 3rd-place teams (ranked by pts, then GD)." },
+      { flag:"🇭🇹", name:"Haiti", gp:3, w:0, d:0, l:3, f:2, a:8, gd:"-6", pts:0, status:"eliminated" }
+    ]
+  },
+  {
+    name: "D", finalGame: "Jun 25", complete: false,
+    teams: [
+      { flag:"🇺🇸", name:"United States", gp:2, w:2, d:0, l:0, f:6, a:1, gd:"+5", pts:6, status:"qualified" },
+      { flag:"🇦🇺", name:"Australia", gp:2, w:1, d:0, l:1, f:2, a:2, gd:"0", pts:3, status:"alive",
+        note:"Win or draw to advance. Tiebreaker: GD (0 vs Paraguay's -2) — currently ahead." },
+      { flag:"🇵🇾", name:"Paraguay", gp:2, w:1, d:0, l:1, f:2, a:4, gd:"-2", pts:3, status:"alive",
+        note:"Must win vs Australia. A draw isn't enough — GD tiebreaker favors Australia." },
+      { flag:"🇹🇷", name:"Türkiye", gp:2, w:0, d:0, l:2, f:0, a:3, gd:"-3", pts:0, status:"eliminated",
+        note:"Must win AND hope to be among 8 best 3rd-place teams. GD (-3) makes it very difficult." }
+    ]
+  },
+  {
+    name: "E", finalGame: "Jun 25", complete: false,
+    teams: [
+      { flag:"🇩🇪", name:"Germany", gp:2, w:2, d:0, l:0, f:9, a:2, gd:"+7", pts:6, status:"qualified" },
+      { flag:"🇨🇮", name:"Ivory Coast", gp:2, w:1, d:0, l:1, f:2, a:2, gd:"0", pts:3, status:"alive",
+        note:"Win or draw to advance. Tiebreaker: GD (0, best among remaining teams)." },
+      { flag:"🇪🇨", name:"Ecuador", gp:2, w:0, d:1, l:1, f:0, a:1, gd:"-1", pts:1, status:"alive",
+        note:"Must win vs Germany AND Ivory Coast must not win. Tiebreaker: GD (-1)." },
+      { flag:"🇨🇼", name:"Curaçao", gp:2, w:0, d:1, l:1, f:1, a:7, gd:"-6", pts:1, status:"alive",
+        note:"Must win AND multiple results must fall their way — very unlikely. Tiebreaker: GD (-6, worst)." }
+    ]
+  },
+  {
+    name: "F", finalGame: "Jun 25", complete: false,
+    teams: [
+      { flag:"🇳🇱", name:"Netherlands", gp:2, w:1, d:1, l:0, f:7, a:3, gd:"+4", pts:4, status:"alive",
+        note:"Win or draw vs Tunisia to advance — nearly certain. Tiebreaker: GD (+4)." },
+      { flag:"🇯🇵", name:"Japan", gp:2, w:1, d:1, l:0, f:6, a:2, gd:"+4", pts:4, status:"alive",
+        note:"Win or draw to advance. A loss is risky if Sweden wins. Tiebreaker: GD (+4, tied with Netherlands)." },
+      { flag:"🇸🇪", name:"Sweden", gp:2, w:1, d:0, l:1, f:6, a:6, gd:"0", pts:3, status:"alive",
+        note:"Must win vs Japan to advance. Tiebreaker: GD (0)." },
+      { flag:"🇹🇳", name:"Tunisia", gp:2, w:0, d:0, l:2, f:1, a:9, gd:"-8", pts:0, status:"eliminated" }
+    ]
+  },
+  {
+    name: "G", finalGame: "Jun 26", complete: false,
+    teams: [
+      { flag:"🇪🇬", name:"Egypt", gp:2, w:1, d:1, l:0, f:4, a:2, gd:"+2", pts:4, status:"alive",
+        note:"Win or draw to advance. Tiebreaker: GD (+2, best in group)." },
+      { flag:"🇮🇷", name:"Iran", gp:2, w:0, d:2, l:0, f:2, a:2, gd:"0", pts:2, status:"alive",
+        note:"Win vs Egypt to advance. A draw likely works if Belgium doesn't win. Tiebreaker: H2H vs Belgium." },
+      { flag:"🇧🇪", name:"Belgium", gp:2, w:0, d:2, l:0, f:1, a:1, gd:"0", pts:2, status:"alive",
+        note:"Win vs New Zealand to advance. A draw likely works if Iran doesn't win. Tiebreaker: H2H vs Iran." },
+      { flag:"🇳🇿", name:"New Zealand", gp:2, w:0, d:1, l:1, f:3, a:5, gd:"-2", pts:1, status:"alive",
+        note:"Need a win AND Egypt to lose. Could target best 3rd-place. Tiebreaker: GD (-2)." }
+    ]
+  },
+  {
+    name: "H", finalGame: "Jun 26", complete: false,
+    teams: [
+      { flag:"🇪🇸", name:"Spain", gp:2, w:1, d:1, l:0, f:4, a:0, gd:"+4", pts:4, status:"alive",
+        note:"Win or draw to advance. Tiebreaker: GD (+4, best in group)." },
+      { flag:"🇺🇾", name:"Uruguay", gp:2, w:0, d:2, l:0, f:3, a:3, gd:"0", pts:2, status:"alive",
+        note:"Win or draw vs Spain to advance. A loss works only if Cape Verde doesn't win. Tiebreaker: H2H vs Cape Verde." },
+      { flag:"🇨🇻", name:"Cape Verde", gp:2, w:0, d:2, l:0, f:2, a:2, gd:"0", pts:2, status:"alive",
+        note:"Must win vs Saudi Arabia AND Uruguay must lose. Tiebreaker: H2H vs Uruguay." },
+      { flag:"🇸🇦", name:"Saudi Arabia", gp:2, w:0, d:1, l:1, f:1, a:5, gd:"-4", pts:1, status:"alive",
+        note:"Must win AND other results go their way — very unlikely. Tiebreaker: GD (-4)." }
+    ]
+  },
+  {
+    name: "I", finalGame: "Jun 26", complete: false,
+    teams: [
+      { flag:"🇫🇷", name:"France", gp:2, w:2, d:0, l:0, f:6, a:1, gd:"+5", pts:6, status:"qualified" },
+      { flag:"🇳🇴", name:"Norway", gp:2, w:2, d:0, l:0, f:7, a:3, gd:"+4", pts:6, status:"qualified" },
+      { flag:"🇸🇳", name:"Senegal", gp:2, w:0, d:0, l:2, f:3, a:6, gd:"-3", pts:0, status:"eliminated" },
+      { flag:"🇮🇶", name:"Iraq", gp:2, w:0, d:0, l:2, f:1, a:7, gd:"-6", pts:0, status:"eliminated" }
+    ]
+  },
+  {
+    name: "J", finalGame: "Jun 27", complete: false,
+    teams: [
+      { flag:"🇦🇷", name:"Argentina", gp:2, w:2, d:0, l:0, f:5, a:0, gd:"+5", pts:6, status:"qualified" },
+      { flag:"🇦🇹", name:"Austria", gp:2, w:1, d:0, l:1, f:3, a:3, gd:"0", pts:3, status:"alive",
+        note:"Win or draw vs Algeria to advance. Tiebreaker: GD (0 vs Algeria's -2) — currently ahead." },
+      { flag:"🇩🇿", name:"Algeria", gp:2, w:1, d:0, l:1, f:2, a:4, gd:"-2", pts:3, status:"alive",
+        note:"Must win vs Austria to advance. A draw isn't enough — GD tiebreaker favors Austria." },
+      { flag:"🇯🇴", name:"Jordan", gp:2, w:0, d:0, l:2, f:2, a:5, gd:"-3", pts:0, status:"eliminated" }
+    ]
+  },
+  {
+    name: "K", finalGame: "Jun 27", complete: false,
+    teams: [
+      { flag:"🇨🇴", name:"Colombia", gp:2, w:2, d:0, l:0, f:4, a:1, gd:"+3", pts:6, status:"qualified" },
+      { flag:"🇵🇹", name:"Portugal", gp:2, w:1, d:1, l:0, f:6, a:1, gd:"+5", pts:4, status:"alive",
+        note:"Win or draw to advance. Tiebreaker: GD (+5, dominant over Congo DR's -1)." },
+      { flag:"🇨🇩", name:"Congo DR", gp:2, w:0, d:1, l:1, f:1, a:2, gd:"-1", pts:1, status:"alive",
+        note:"Must win AND Portugal must lose — very unlikely given GD gap. Tiebreaker: GD (-1)." },
+      { flag:"🇺🇿", name:"Uzbekistan", gp:2, w:0, d:0, l:2, f:1, a:8, gd:"-7", pts:0, status:"eliminated" }
+    ]
+  },
+  {
+    name: "L", finalGame: "Jun 27", complete: false,
+    teams: [
+      { flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", name:"England", gp:2, w:1, d:1, l:0, f:4, a:2, gd:"+2", pts:4, status:"alive",
+        note:"Win or draw to advance. A loss risks elimination if Croatia wins. Tiebreaker: GD (+2 vs Ghana's +1)." },
+      { flag:"🇬🇭", name:"Ghana", gp:2, w:1, d:1, l:0, f:1, a:0, gd:"+1", pts:4, status:"alive",
+        note:"Win or draw to advance. A loss could eliminate them if Croatia wins. Tiebreaker: GD (+1 vs England's +2) — behind." },
+      { flag:"🇭🇷", name:"Croatia", gp:2, w:1, d:0, l:1, f:3, a:4, gd:"-1", pts:3, status:"alive",
+        note:"Must beat Ghana to advance. Tiebreaker: GD (-1)." },
+      { flag:"🇵🇦", name:"Panama", gp:2, w:0, d:0, l:2, f:0, a:2, gd:"-2", pts:0, status:"eliminated" }
+    ]
+  },
+];
+function gdClass(gd) {
+  if (gd.startsWith('+') && gd !== '+0') return 'gd-pos';
+  if (gd.startsWith('-')) return 'gd-neg';
+  return '';
+}
+
+function render() {
+  const container = document.getElementById('groups-container');
+
+  groups.forEach(g => {
+    const card = document.createElement('div');
+    card.className = 'group-card';
+
+    // Header
+    const hdr = document.createElement('div');
+    hdr.className = 'group-header';
+    const metaHtml = g.complete
+      ? '<span class="badge-final">FINAL</span>'
+      : `<span class="group-meta">Final matchday: ${g.finalGame}</span>`;
+    hdr.innerHTML = `<span class="group-title">GROUP ${g.name}</span>${metaHtml}`;
+    card.appendChild(hdr);
+
+    // Table
+    const table = document.createElement('table');
+    table.innerHTML = `
+      <thead>
+        <tr>
+          <th style="width:45%">Team</th>
+          <th>GP</th><th>W</th><th>D</th><th>L</th>
+          <th>F</th><th>A</th><th>GD</th><th>Pts</th>
+        </tr>
+      </thead>
+    `;
+
+    const tbody = document.createElement('tbody');
+
+    g.teams.forEach(t => {
+      const rowClass = t.status === 'qualified' ? 'row-qualified'
+                     : t.status === 'eliminated' ? 'row-eliminated'
+                     : '';
+
+      const badge = t.status === 'qualified'
+        ? '<span class="status-badge badge-in">ADVANCED</span>'
+        : t.status === 'eliminated'
+        ? '<span class="status-badge badge-out">OUT</span>'
+        : '';
+
+      const dataRow = document.createElement('tr');
+      dataRow.className = `data-row ${rowClass}`;
+      dataRow.innerHTML = `
+        <td>
+          <div class="team-cell">
+            <span class="team-flag">${t.flag}</span>
+            <span class="team-name">${t.name}</span>${badge}
+          </div>
+        </td>
+        <td>${t.gp}</td>
+        <td>${t.w}</td>
+        <td>${t.d}</td>
+        <td>${t.l}</td>
+        <td>${t.f}</td>
+        <td>${t.a}</td>
+        <td class="${gdClass(t.gd)}">${t.gd}</td>
+        <td class="pts-cell">${t.pts}</td>
+      `;
+      tbody.appendChild(dataRow);
+
+      const noteRow = document.createElement('tr');
+      noteRow.className = 'note-row';
+      noteRow.innerHTML = `<td colspan="9">${t.note ? '↳ ' + t.note : '&nbsp;'}</td>`;
+      tbody.appendChild(noteRow);
+    });
+
+    table.appendChild(tbody);
+    card.appendChild(table);
+    container.appendChild(card);
+  });
+}
+
+render();
+</script>
+</body>
+</html>
