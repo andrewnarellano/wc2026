@@ -36,8 +36,21 @@
     .dot-green { background: var(--green); }
     .dot-tbd { background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.35); }
 
-    .bracket-scroll { overflow-x: auto; padding: 24px 20px 48px; }
+    .bracket-scroll { overflow-x: auto; padding: 24px 20px 48px; -webkit-overflow-scrolling: touch; }
     .bracket-wrap { display: flex; align-items: flex-start; min-width: 1380px; }
+
+    .scroll-hint {
+      display: none;
+      text-align: center;
+      font-size: 0.72rem;
+      color: rgba(255,255,255,0.4);
+      padding: 8px 0 0;
+      letter-spacing: 0.3px;
+    }
+    @media (max-width: 900px) {
+      .scroll-hint { display: block; }
+      .bracket-scroll { padding: 12px 12px 40px; }
+    }
 
     /* ── Match card — fixed 122px (28 header + 34 + 34 team rows + 26 venue) ── */
     .match {
@@ -193,6 +206,7 @@
   <div class="legend-item"><div class="legend-dot dot-tbd"></div> TBD — pending group stage</div>
 </div>
 
+<div class="scroll-hint">← swipe to see full bracket →</div>
 <div class="bracket-scroll">
   <div class="bracket-wrap" id="bw"></div>
 </div>
