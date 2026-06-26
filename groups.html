@@ -493,7 +493,7 @@ function render() {
 
     g.teams.forEach(t => {
       const rowClass = t.status === 'qualified' ? 'row-qualified'
-                     : t.status === 'eliminated' ? 'row-eliminated'
+                     : (t.status === 'eliminated' && g.complete) ? 'row-eliminated'
                      : '';
 
       const badge = t.status === 'qualified'
@@ -524,7 +524,7 @@ function render() {
 
       const noteRow = document.createElement('tr');
       noteRow.className = 'note-row';
-      noteRow.innerHTML = `<td colspan="9">${t.note ? '↳ ' + t.note : '&nbsp;'}</td>`;
+      noteRow.innerHTML = `<td colspan="9">${!g.complete && t.note ? '↳ ' + t.note : '&nbsp;'}</td>`;
       tbody.appendChild(noteRow);
     });
 
