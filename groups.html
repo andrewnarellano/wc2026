@@ -301,7 +301,13 @@
 
     .tpq-wrap tbody tr.data-row td { padding-left: 4px; padding-right: 4px; }
     .tpq-wrap tbody tr.data-row td:first-child { padding-left: 8px; }
-    .tpq-wrap .pts-cell { padding-right: 10px !important; }
+    .tpq-wrap .pts-cell { padding-right: 14px !important; }
+    .tpq-wrap thead th:last-child { padding-right: 14px; }
+    .tpq-badge .badge-mobile { display: none; }
+    @media (max-width: 900px) {
+      .tpq-badge .badge-desktop { display: none; }
+      .tpq-badge .badge-mobile { display: inline; }
+    }
   </style>
 </head>
 <body>
@@ -617,7 +623,7 @@ function renderTPQ() {
     if (i === 8) row.classList.add('tpq-cutoff');
 
     const qualified = isQualified(t);
-    const pill = qualified ? '<span class="status-badge badge-in">A</span>' : '';
+    const pill = qualified ? '<span class="status-badge badge-in tpq-badge"><span class="badge-desktop">ADVANCED</span><span class="badge-mobile">A</span></span>' : '';
     if (qualified) row.classList.add('row-qualified');
 
     row.innerHTML = `
