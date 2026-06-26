@@ -389,26 +389,26 @@ const groups = [
     name: "G", finalGame: "Jun 26", complete: false,
     teams: [
       { flag:"🇪🇬", name:"Egypt", gp:2, w:1, d:1, l:0, f:4, a:2, gd:"+2", pts:4, status:"alive",
-        note:"Win or draw to advance. Tiebreaker: GD (+2, best in group)." },
+        note:"Leading group at 4pts, 2pts clear of 2nd. Win or draw to clinch." },
       { flag:"🇮🇷", name:"Iran", gp:2, w:0, d:2, l:0, f:2, a:2, gd:"0", pts:2, status:"alive",
-        note:"Win vs Egypt to advance. A draw likely works if Belgium doesn't win. Tiebreaker: H2H vs Belgium." },
+        note:"2nd at 2pts but level with 3rd. Win to hold top-2 position." },
       { flag:"🇧🇪", name:"Belgium", gp:2, w:0, d:2, l:0, f:1, a:1, gd:"0", pts:2, status:"alive",
-        note:"Win vs New Zealand to advance. A draw likely works if Iran doesn't win. Tiebreaker: H2H vs Iran." },
+        note:"3rd at 2pts but level with 2nd. Win to break into top 2." },
       { flag:"🇳🇿", name:"New Zealand", gp:2, w:0, d:1, l:1, f:3, a:5, gd:"-2", pts:1, status:"alive",
-        note:"Need a win AND Egypt to lose. Could target best 3rd-place. Tiebreaker: GD (-2)." }
+        note:"4th at 1pts. Must win and need other results to advance." }
     ]
   },
   {
     name: "H", finalGame: "Jun 26", complete: false,
     teams: [
       { flag:"🇪🇸", name:"Spain", gp:2, w:1, d:1, l:0, f:4, a:0, gd:"+4", pts:4, status:"alive",
-        note:"Win or draw to advance. Tiebreaker: GD (+4, best in group)." },
+        note:"Leading group at 4pts, 2pts clear of 2nd. Win or draw to clinch." },
       { flag:"🇺🇾", name:"Uruguay", gp:2, w:0, d:2, l:0, f:3, a:3, gd:"0", pts:2, status:"alive",
-        note:"Win or draw vs Spain to advance. A loss works only if Cape Verde doesn't win. Tiebreaker: H2H vs Cape Verde." },
+        note:"2nd at 2pts but level with 3rd. Win to hold top-2 position." },
       { flag:"🇨🇻", name:"Cape Verde", gp:2, w:0, d:2, l:0, f:2, a:2, gd:"0", pts:2, status:"alive",
-        note:"Must win vs Saudi Arabia AND Uruguay must lose. Tiebreaker: H2H vs Uruguay." },
+        note:"3rd at 2pts but level with 2nd. Win to break into top 2." },
       { flag:"🇸🇦", name:"Saudi Arabia", gp:2, w:0, d:1, l:1, f:1, a:5, gd:"-4", pts:1, status:"alive",
-        note:"Must win AND other results go their way — very unlikely. Tiebreaker: GD (-4)." }
+        note:"4th at 1pts. Must win and need other results to advance." }
     ]
   },
   {
@@ -425,9 +425,9 @@ const groups = [
     teams: [
       { flag:"🇦🇷", name:"Argentina", gp:2, w:2, d:0, l:0, f:5, a:0, gd:"+5", pts:6, status:"qualified" },
       { flag:"🇦🇹", name:"Austria", gp:2, w:1, d:0, l:1, f:3, a:3, gd:"0", pts:3, status:"alive",
-        note:"Win or draw vs Algeria to advance. Tiebreaker: GD (0 vs Algeria's -2) — currently ahead." },
+        note:"2nd at 3pts but level with 3rd. Win to hold top-2 position." },
       { flag:"🇩🇿", name:"Algeria", gp:2, w:1, d:0, l:1, f:2, a:4, gd:"-2", pts:3, status:"alive",
-        note:"Must win vs Austria to advance. A draw isn't enough — GD tiebreaker favors Austria." },
+        note:"3rd at 3pts but level with 2nd. Win to break into top 2." },
       { flag:"🇯🇴", name:"Jordan", gp:2, w:0, d:0, l:2, f:2, a:5, gd:"-3", pts:0, status:"eliminated" }
     ]
   },
@@ -436,9 +436,9 @@ const groups = [
     teams: [
       { flag:"🇨🇴", name:"Colombia", gp:2, w:2, d:0, l:0, f:4, a:1, gd:"+3", pts:6, status:"qualified" },
       { flag:"🇵🇹", name:"Portugal", gp:2, w:1, d:1, l:0, f:6, a:1, gd:"+5", pts:4, status:"alive",
-        note:"Win or draw to advance. Tiebreaker: GD (+5, dominant over Congo DR's -1)." },
+        note:"2nd at 4pts, 3pts clear of 3rd. Win or draw to clinch." },
       { flag:"🇨🇩", name:"Congo DR", gp:2, w:0, d:1, l:1, f:1, a:2, gd:"-1", pts:1, status:"alive",
-        note:"Must win AND Portugal must lose — very unlikely given GD gap. Tiebreaker: GD (-1)." },
+        note:"3rd at 1pts, 3pts behind 2nd. Must win to challenge for top-2 finish." },
       { flag:"🇺🇿", name:"Uzbekistan", gp:2, w:0, d:0, l:2, f:1, a:8, gd:"-7", pts:0, status:"eliminated" }
     ]
   },
@@ -446,11 +446,11 @@ const groups = [
     name: "L", finalGame: "Jun 27", complete: false,
     teams: [
       { flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿", name:"England", gp:2, w:1, d:1, l:0, f:4, a:2, gd:"+2", pts:4, status:"alive",
-        note:"Win or draw to advance. A loss risks elimination if Croatia wins. Tiebreaker: GD (+2 vs Ghana's +1)." },
+        note:"Level at top with 4pts. Win to take command of the group." },
       { flag:"🇬🇭", name:"Ghana", gp:2, w:1, d:1, l:0, f:1, a:0, gd:"+1", pts:4, status:"alive",
-        note:"Win or draw to advance. A loss could eliminate them if Croatia wins. Tiebreaker: GD (+1 vs England's +2) — behind." },
+        note:"2nd at 4pts, 1pt clear of 3rd. Win or draw to clinch." },
       { flag:"🇭🇷", name:"Croatia", gp:2, w:1, d:0, l:1, f:3, a:4, gd:"-1", pts:3, status:"alive",
-        note:"Must beat Ghana to advance. Tiebreaker: GD (-1)." },
+        note:"3rd at 3pts, 1pt behind 2nd. Must win to challenge for top-2 finish." },
       { flag:"🇵🇦", name:"Panama", gp:2, w:0, d:0, l:2, f:0, a:2, gd:"-2", pts:0, status:"eliminated" }
     ]
   },
