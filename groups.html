@@ -548,7 +548,7 @@ function renderTPQ() {
   const thirds = [];
   groups.forEach(g => {
     const third = g.teams[2];
-    if (!third) return;
+    if (!third || third.status === 'eliminated') return;
     thirds.push({ group: g.name, complete: g.complete, ...third });
     if (!g.complete) incompleteCount++;
   });
