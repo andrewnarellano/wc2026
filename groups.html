@@ -292,7 +292,7 @@
     }
 
     tr.tpq-cutoff td {
-      border-top: 3px solid rgba(232,194,26,0.85) !important;
+      border-top: 3px solid rgba(239,68,68,0.6) !important;
     }
   </style>
 </head>
@@ -603,7 +603,9 @@ function renderTPQ() {
     row.className = 'data-row';
     if (i === 8) row.classList.add('tpq-cutoff');
 
-    const pill = isQualified(t) ? '<span class="status-badge badge-in">ADVANCED</span>' : '';
+    const qualified = isQualified(t);
+    const pill = qualified ? '<span class="status-badge badge-in">ADVANCED</span>' : '';
+    if (qualified) row.classList.add('row-qualified');
 
     row.innerHTML = `
       <td style="text-align:center; color:rgba(255,255,255,0.45); font-size:0.75rem; font-weight:700">${t.group}</td>
