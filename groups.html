@@ -234,7 +234,7 @@
     thead th:last-child { padding-right: 28px; }
 
     /* Advancement note row */
-    tr.note-row td {
+    tr.note-row td, .note-cell {
       padding: 3px 14px 7px 36px;
       font-size: 0.72rem;
       color: rgba(255,255,255,0.5);
@@ -260,7 +260,7 @@
       tbody tr.data-row td { padding: 6px 4px; font-size: 0.75rem; }
       tbody tr.data-row td:first-child { padding-left: 10px; }
       .pts-cell { padding-right: 10px !important; }
-      .group-card tbody tr.note-row td { padding: 2px 10px 6px 28px; font-size: 0.65rem !important; }
+      .group-card tbody tr.note-row td, .note-cell { padding: 2px 10px 6px 28px; font-size: 0.65rem !important; }
       .legend { padding: 6px 14px; gap: 12px; font-size: 0.71rem; flex-wrap: nowrap; }
       .legend-dot { width: 8px; height: 8px; }
     }
@@ -275,7 +275,7 @@
       tbody tr.data-row td { padding: 5px 3px; font-size: 0.68rem; }
       tbody tr.data-row td:first-child { padding-left: 8px; }
       .pts-cell { padding-right: 8px !important; }
-      tr.note-row td { padding: 2px 8px 5px 22px; font-size: 0.65rem; }
+      tr.note-row td, .note-cell { padding: 2px 8px 5px 22px; font-size: 0.65rem; }
       .team-flag { font-size: 0.9rem; }
       .tpq-wrap { max-width: 100%; }
       .tpq-section { margin-top: 16px; }
@@ -530,7 +530,7 @@ function render() {
       const displayNote = tpqQualified.has(t.name)
         ? 'Qualifies for knockout round as Top 8 3rd-place team.'
         : ((!g.complete || t.status === 'alive') && t.note ? t.note : '');
-      noteRow.innerHTML = `<td colspan="9">${displayNote ? '↳ ' + displayNote : '&nbsp;'}</td>`;
+      noteRow.innerHTML = `<td class="note-cell" colspan="9">${displayNote ? '↳ ' + displayNote : '&nbsp;'}</td>`;
       tbody.appendChild(noteRow);
     });
 
