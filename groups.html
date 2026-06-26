@@ -292,7 +292,7 @@
     }
 
     tr.tpq-cutoff td {
-      border-top: 2px solid rgba(239,68,68,0.6) !important;
+      border-top: 3px solid rgba(232,194,26,0.85) !important;
     }
   </style>
 </head>
@@ -542,11 +542,15 @@ function renderTPQ() {
   const container = document.getElementById('tpq-container');
   if (!container) return;
 
+  if (!groups.some(g => g.complete)) return;
+
+  let incompleteCount = 0;
   const thirds = [];
   groups.forEach(g => {
-    if (!g.complete) return;
-    const third = g.teams.find(t => t.status === 'alive');
-    if (third) thirds.push({ group: g.name, ...third });
+    const third = g.teams[2];
+    if (!third) return;
+    thirds.push({ group: g.name, complete: g.complete, ...third });
+    if (!g.complete) incompleteCount++;
   });
 
   if (thirds.length === 0) return;
@@ -558,14 +562,27 @@ function renderTPQ() {
     return b.f - a.f;
   });
 
-  const showCutoff = thirds.length >= 9;
+  function isQualified(team) {
+    if (!team.complete) return false;
+    const teamGd = parseGdNum(team.gd);
+    const definiteAhead = thirds.filter(t => {
+      if (!t.complete || t === team) return false;
+      if (t.pts > team.pts) return true;
+      if (t.pts === team.pts && parseGdNum(t.gd) > teamGd) return true;
+      if (t.pts === team.pts && parseGdNum(t.gd) === teamGd && t.f > team.f) return true;
+      return false;
+    }).length;
+    return (definiteAhead + incompleteCount) < 8;
+  }
+
+  const completedCount = 12 - incompleteCount;
 
   const wrap = document.createElement('div');
   wrap.className = 'tpq-wrap';
 
   const hdr = document.createElement('div');
   hdr.className = 'group-header';
-  hdr.innerHTML = `<span class="group-title">THIRD PLACE QUALIFIERS</span><span class="group-meta">${thirds.length} of 12 groups complete</span>`;
+  hdr.innerHTML = `<span class="group-title">THIRD PLACE QUALIFIERS</span><span class="group-meta">${completedCount} of 12 groups complete</span>`;
   wrap.appendChild(hdr);
 
   const table = document.createElement('table');
@@ -584,14 +601,16 @@ function renderTPQ() {
   thirds.forEach((t, i) => {
     const row = document.createElement('tr');
     row.className = 'data-row';
-    if (showCutoff && i === 8) row.classList.add('tpq-cutoff');
+    if (i === 8) row.classList.add('tpq-cutoff');
+
+    const pill = isQualified(t) ? '<span class="status-badge badge-in">ADVANCED</span>' : '';
 
     row.innerHTML = `
       <td style="text-align:center; color:rgba(255,255,255,0.45); font-size:0.75rem; font-weight:700">${t.group}</td>
       <td>
         <div class="team-cell">
           <span class="team-flag">${t.flag}</span>
-          <span class="team-name">${t.name}</span>
+          <span class="team-name">${t.name}</span>${pill}
         </div>
       </td>
       <td>${t.gp}</td>
