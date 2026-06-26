@@ -298,6 +298,10 @@
     tr.tpq-cutoff td {
       border-top: 3px solid rgba(239,68,68,0.6) !important;
     }
+
+    .tpq-wrap tbody tr.data-row td { padding: 8px 4px; }
+    .tpq-wrap tbody tr.data-row td:first-child { padding-left: 8px; }
+    .tpq-wrap .pts-cell { padding-right: 10px !important; }
   </style>
 </head>
 <body>
@@ -599,7 +603,7 @@ function renderTPQ() {
     <thead>
       <tr>
         <th style="text-align:center">Grp</th>
-        <th style="text-align:left; padding-left:14px; width:35%">Team</th>
+        <th style="text-align:left; padding-left:8px; width:35%">Team</th>
         <th>GP</th><th>W</th><th>D</th><th>L</th>
         <th>F</th><th>A</th><th>GD</th><th>Pts</th>
       </tr>
