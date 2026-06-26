@@ -498,7 +498,7 @@ function render() {
 
       const badge = t.status === 'qualified'
         ? '<span class="status-badge badge-in">ADVANCED</span>'
-        : t.status === 'eliminated'
+        : (t.status === 'eliminated' && g.complete)
         ? '<span class="status-badge badge-out">OUT</span>'
         : '';
 
