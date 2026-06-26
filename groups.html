@@ -493,7 +493,7 @@ function render() {
 
     g.teams.forEach(t => {
       const fullyOut = t.status === 'eliminated' &&
-        (g.complete || g.teams[2].status !== 'eliminated');
+        (g.complete || g.teams[2].pts >= (t.pts + 3));
       const rowClass = t.status === 'qualified' ? 'row-qualified'
                      : fullyOut ? 'row-eliminated'
                      : '';
