@@ -246,6 +246,8 @@
     tr.data-row:last-child td { border-bottom: none; }
 
     @media (max-width: 900px) and (orientation: portrait) {
+      .subtitle-sep { display: none; }
+      .subtitle-date { display: block; }
       .container { padding: 12px; }
       .groups-grid { grid-template-columns: 1fr; gap: 12px; }
       thead th { padding: 4px 4px; font-size: 0.63rem; }
@@ -297,7 +299,7 @@
 <header>
   <div class="header-left">
     <h1>2026 FIFA WORLD CUP</h1>
-    <div class="subtitle">Group Stage Standings &nbsp;·&nbsp; Updated Jun 25, 2026</div>
+    <div class="subtitle">Group Stage Standings<span class="subtitle-sep"> &nbsp;·&nbsp; </span><span class="subtitle-date">Updated Jun 25, 2026</span></div>
   </div>
   <a href="bracket.html" class="nav-btn">View Bracket →</a>
 </header>
