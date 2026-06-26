@@ -325,7 +325,7 @@ const groups = [
       { flag:"🇲🇽", name:"Mexico", gp:3, w:3, d:0, l:0, f:6, a:0, gd:"+6", pts:9, status:"qualified" },
       { flag:"🇿🇦", name:"South Africa", gp:3, w:1, d:1, l:1, f:2, a:3, gd:"-1", pts:4, status:"qualified" },
       { flag:"🇰🇷", name:"South Korea", gp:3, w:1, d:0, l:2, f:2, a:3, gd:"-1", pts:3, status:"alive",
-        note:"Finished 3rd. Advances only if among the 8 best 3rd-place teams — unlikely at 3pts, GD (-1)." },
+        note:"Finished 3rd at 3pts (GD -1). Advances if among the 8 best 3rd-place teams." },
       { flag:"🇨🇿", name:"Czechia", gp:3, w:0, d:1, l:2, f:2, a:6, gd:"-4", pts:1, status:"eliminated" }
     ]
   },
@@ -335,7 +335,7 @@ const groups = [
       { flag:"🇨🇭", name:"Switzerland", gp:3, w:2, d:1, l:0, f:7, a:3, gd:"+4", pts:7, status:"qualified" },
       { flag:"🇨🇦", name:"Canada", gp:3, w:1, d:1, l:1, f:8, a:3, gd:"+5", pts:4, status:"qualified" },
       { flag:"🇧🇦", name:"Bosnia-Herzegovina", gp:3, w:1, d:1, l:1, f:5, a:6, gd:"-1", pts:4, status:"alive",
-        note:"Finished 3rd. Advances if among the 8 best 3rd-place teams (ranked by pts, then GD)." },
+        note:"Finished 3rd at 4pts (GD -1). Advances if among the 8 best 3rd-place teams." },
       { flag:"🇶🇦", name:"Qatar", gp:3, w:0, d:1, l:2, f:2, a:10, gd:"-8", pts:1, status:"eliminated" }
     ]
   },
@@ -345,7 +345,7 @@ const groups = [
       { flag:"🇧🇷", name:"Brazil", gp:3, w:2, d:1, l:0, f:7, a:1, gd:"+6", pts:7, status:"qualified" },
       { flag:"🇲🇦", name:"Morocco", gp:3, w:2, d:1, l:0, f:6, a:3, gd:"+3", pts:7, status:"qualified" },
       { flag:"🏴󠁧󠁢󠁳󠁣󠁴󠁿", name:"Scotland", gp:3, w:1, d:0, l:2, f:1, a:4, gd:"-3", pts:3, status:"alive",
-        note:"Finished 3rd. Advances if among the 8 best 3rd-place teams (ranked by pts, then GD)." },
+        note:"Finished 3rd at 3pts (GD -3). Advances if among the 8 best 3rd-place teams." },
       { flag:"🇭🇹", name:"Haiti", gp:3, w:0, d:0, l:3, f:2, a:8, gd:"-6", pts:0, status:"eliminated" }
     ]
   },
@@ -356,7 +356,7 @@ const groups = [
       { flag:"🇦🇺", name:"Australia", gp:3, w:1, d:1, l:1, f:2, a:2, gd:"0", pts:4, status:"qualified",
         note:"Win or draw to advance. Tiebreaker: GD (0 vs Paraguay's -2) — currently ahead." },
       { flag:"🇵🇾", name:"Paraguay", gp:3, w:1, d:1, l:1, f:2, a:4, gd:"-2", pts:4, status:"alive",
-        note:"Must win vs Australia. A draw isn't enough — GD tiebreaker favors Australia." },
+        note:"Finished 3rd at 4pts (GD -2). Advances if among the 8 best 3rd-place teams." },
       { flag:"🇹🇷", name:"Türkiye", gp:3, w:1, d:0, l:2, f:3, a:5, gd:"-2", pts:3, status:"eliminated",
         note:"Must win AND hope to be among 8 best 3rd-place teams. GD (-3) makes it very difficult." }
     ]
@@ -368,7 +368,7 @@ const groups = [
       { flag:"🇨🇮", name:"Ivory Coast", gp:3, w:2, d:0, l:1, f:4, a:2, gd:"+2", pts:6, status:"qualified",
         note:"Win or draw to advance. Tiebreaker: GD (0, best among remaining teams)." },
       { flag:"🇪🇨", name:"Ecuador", gp:3, w:1, d:1, l:1, f:2, a:2, gd:"0", pts:4, status:"alive",
-        note:"Must win vs Germany AND Ivory Coast must not win. Tiebreaker: GD (-1)." },
+        note:"Finished 3rd at 4pts (GD 0). Advances if among the 8 best 3rd-place teams." },
       { flag:"🇨🇼", name:"Curaçao", gp:3, w:0, d:1, l:2, f:1, a:9, gd:"-8", pts:1, status:"eliminated",
         note:"Must win AND multiple results must fall their way — very unlikely. Tiebreaker: GD (-6, worst)." }
     ]
@@ -381,7 +381,7 @@ const groups = [
       { flag:"🇯🇵", name:"Japan", gp:3, w:1, d:2, l:0, f:7, a:3, gd:"+4", pts:5, status:"qualified",
         note:"Win or draw to advance. A loss is risky if Sweden wins. Tiebreaker: GD (+4, tied with Netherlands)." },
       { flag:"🇸🇪", name:"Sweden", gp:3, w:1, d:1, l:1, f:7, a:7, gd:"0", pts:4, status:"alive",
-        note:"Must win vs Japan to advance. Tiebreaker: GD (0)." },
+        note:"Finished 3rd at 4pts (GD 0). Advances if among the 8 best 3rd-place teams." },
       { flag:"🇹🇳", name:"Tunisia", gp:3, w:0, d:0, l:3, f:2, a:12, gd:"-10", pts:0, status:"eliminated" }
     ]
   },
@@ -526,7 +526,7 @@ function render() {
 
       const noteRow = document.createElement('tr');
       noteRow.className = 'note-row';
-      noteRow.innerHTML = `<td colspan="9">${!g.complete && t.note ? '↳ ' + t.note : '&nbsp;'}</td>`;
+      noteRow.innerHTML = `<td colspan="9">${(!g.complete || t.status === 'alive') && t.note ? '↳ ' + t.note : '&nbsp;'}</td>`;
       tbody.appendChild(noteRow);
     });
 
