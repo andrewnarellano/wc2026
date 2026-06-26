@@ -526,7 +526,10 @@ function render() {
 
       const noteRow = document.createElement('tr');
       noteRow.className = 'note-row';
-      noteRow.innerHTML = `<td colspan="9">${(!g.complete || t.status === 'alive') && t.note ? '↳ ' + t.note : '&nbsp;'}</td>`;
+      const displayNote = tpqQualified.has(t.name)
+        ? 'Qualifies for knockout round as Top 8 3rd-place team.'
+        : ((!g.complete || t.status === 'alive') && t.note ? t.note : '');
+      noteRow.innerHTML = `<td colspan="9">${displayNote ? '↳ ' + displayNote : '&nbsp;'}</td>`;
       tbody.appendChild(noteRow);
     });
 
@@ -636,6 +639,34 @@ function renderTPQ() {
   wrap.appendChild(table);
   container.appendChild(wrap);
 }
+
+// Build qualified 3rd-place set so render() can reference it
+const _tpqThirds = (() => {
+  const arr = [];
+  groups.forEach(g => { const t = g.teams[2]; if (t) arr.push({ complete: g.complete, ...t }); });
+  arr.sort((a, b) => {
+    if (b.pts !== a.pts) return b.pts - a.pts;
+    const d = parseGdNum(b.gd) - parseGdNum(a.gd);
+    if (d !== 0) return d;
+    return b.f - a.f;
+  });
+  return arr;
+})();
+const tpqQualified = new Set(_tpqThirds.filter(team => {
+  if (!team.complete) return false;
+  const teamGd = parseGdNum(team.gd);
+  const ahead = _tpqThirds.filter(t => {
+    if (t === team) return false;
+    if (t.complete) {
+      if (t.pts > team.pts) return true;
+      if (t.pts === team.pts && parseGdNum(t.gd) > teamGd) return true;
+      if (t.pts === team.pts && parseGdNum(t.gd) === teamGd && t.f > team.f) return true;
+      return false;
+    }
+    return (t.pts + 3) >= team.pts;
+  }).length;
+  return ahead < 8;
+}).map(t => t.name));
 
 render();
 renderTPQ();
