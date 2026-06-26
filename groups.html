@@ -492,13 +492,15 @@ function render() {
     const tbody = document.createElement('tbody');
 
     g.teams.forEach(t => {
+      const fullyOut = t.status === 'eliminated' &&
+        (g.complete || g.teams[2].status !== 'eliminated');
       const rowClass = t.status === 'qualified' ? 'row-qualified'
-                     : (t.status === 'eliminated' && g.complete) ? 'row-eliminated'
+                     : fullyOut ? 'row-eliminated'
                      : '';
 
       const badge = t.status === 'qualified'
         ? '<span class="status-badge badge-in">ADVANCED</span>'
-        : (t.status === 'eliminated' && g.complete)
+        : fullyOut
         ? '<span class="status-badge badge-out">OUT</span>'
         : '';
 
