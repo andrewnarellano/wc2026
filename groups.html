@@ -544,13 +544,11 @@ function renderTPQ() {
 
   if (!groups.some(g => g.complete)) return;
 
-  let incompleteCount = 0;
   const thirds = [];
   groups.forEach(g => {
     const third = g.teams[2];
-    if (!third || third.status === 'eliminated') return;
+    if (!third) return;
     thirds.push({ group: g.name, complete: g.complete, ...third });
-    if (!g.complete) incompleteCount++;
   });
 
   if (thirds.length === 0) return;
@@ -565,17 +563,22 @@ function renderTPQ() {
   function isQualified(team) {
     if (!team.complete) return false;
     const teamGd = parseGdNum(team.gd);
-    const definiteAhead = thirds.filter(t => {
-      if (!t.complete || t === team) return false;
-      if (t.pts > team.pts) return true;
-      if (t.pts === team.pts && parseGdNum(t.gd) > teamGd) return true;
-      if (t.pts === team.pts && parseGdNum(t.gd) === teamGd && t.f > team.f) return true;
-      return false;
+    const ahead = thirds.filter(t => {
+      if (t === team) return false;
+      if (t.complete) {
+        if (t.pts > team.pts) return true;
+        if (t.pts === team.pts && parseGdNum(t.gd) > teamGd) return true;
+        if (t.pts === team.pts && parseGdNum(t.gd) === teamGd && t.f > team.f) return true;
+        return false;
+      } else {
+        // Incomplete group: a threat only if its 3rd-place team can reach team.pts (1 game left = +3 max)
+        return (t.pts + 3) >= team.pts;
+      }
     }).length;
-    return (definiteAhead + incompleteCount) < 8;
+    return ahead < 8;
   }
 
-  const completedCount = 12 - incompleteCount;
+  const completedCount = groups.filter(g => g.complete).length;
 
   const wrap = document.createElement('div');
   wrap.className = 'tpq-wrap';
