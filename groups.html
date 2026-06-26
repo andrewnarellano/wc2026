@@ -500,7 +500,7 @@ function render() {
                      : '';
 
       const badge = (t.status === 'qualified' || tpqQualified.has(t.name))
-        ? '<span class="status-badge badge-in">ADVANCED</span>'
+        ? '<span class="status-badge badge-in">ADV</span>'
         : fullyOut
         ? '<span class="status-badge badge-out">OUT</span>'
         : '';
@@ -613,7 +613,7 @@ function renderTPQ() {
     if (i === 8) row.classList.add('tpq-cutoff');
 
     const qualified = isQualified(t);
-    const pill = qualified ? '<span class="status-badge badge-in">ADVANCED</span>' : '';
+    const pill = qualified ? '<span class="status-badge badge-in">ADV</span>' : '';
     if (qualified) row.classList.add('row-qualified');
 
     row.innerHTML = `
