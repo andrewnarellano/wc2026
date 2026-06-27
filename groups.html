@@ -409,16 +409,13 @@ const groups = [
     ]
   },
   {
-    name: "H", finalGame: "Jun 26", complete: false,
+    name: "H", finalGame: "Jun 26", complete: true,
     teams: [
-      { flag:"🇪🇸", name:"Spain", gp:2, w:1, d:1, l:0, f:4, a:0, gd:"+4", pts:4, status:"alive",
-        note:"Win or draw vs Uruguay to clinch top spot." },
-      { flag:"🇺🇾", name:"Uruguay", gp:2, w:0, d:2, l:0, f:3, a:3, gd:"0", pts:2, status:"alive",
-        note:"Must beat Spain to secure top-2. A draw leaves them vulnerable if Cape Verde wins." },
-      { flag:"🇨🇻", name:"Cape Verde", gp:2, w:0, d:2, l:0, f:2, a:2, gd:"0", pts:2, status:"alive",
-        note:"Must beat Saudi Arabia and need Spain or Uruguay to slip up to advance." },
-      { flag:"🇸🇦", name:"Saudi Arabia", gp:2, w:0, d:1, l:1, f:1, a:5, gd:"-4", pts:1, status:"alive",
-        note:"Must beat Cape Verde and need multiple results to go their way." }
+      { flag:"🇪🇸", name:"Spain", gp:3, w:2, d:1, l:0, f:5, a:0, gd:"+5", pts:7, status:"qualified" },
+      { flag:"🇨🇻", name:"Cape Verde", gp:3, w:0, d:3, l:0, f:2, a:2, gd:"0", pts:3, status:"qualified" },
+      { flag:"🇺🇾", name:"Uruguay", gp:3, w:0, d:2, l:1, f:3, a:4, gd:"-1", pts:2, status:"alive",
+        note:"Finished 3rd at 2pts (GD -1). Advances if among the 8 best 3rd-place teams." },
+      { flag:"🇸🇦", name:"Saudi Arabia", gp:3, w:0, d:2, l:1, f:1, a:5, gd:"-4", pts:2, status:"eliminated" }
     ]
   },
   {
