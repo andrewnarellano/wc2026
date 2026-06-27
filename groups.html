@@ -396,16 +396,13 @@ const groups = [
     ]
   },
   {
-    name: "G", finalGame: "Jun 26", complete: false,
+    name: "G", finalGame: "Jun 26", complete: true,
     teams: [
-      { flag:"🇪🇬", name:"Egypt", gp:2, w:1, d:1, l:0, f:4, a:2, gd:"+2", pts:4, status:"alive",
-        note:"Win or draw vs Iran to clinch top spot." },
-      { flag:"🇮🇷", name:"Iran", gp:2, w:0, d:2, l:0, f:2, a:2, gd:"0", pts:2, status:"alive",
-        note:"Must beat Egypt to secure top-2. A draw keeps them alive only if New Zealand beats Belgium." },
-      { flag:"🇧🇪", name:"Belgium", gp:2, w:0, d:2, l:0, f:1, a:1, gd:"0", pts:2, status:"alive",
-        note:"Must beat New Zealand and need Iran to drop points vs Egypt to advance." },
-      { flag:"🇳🇿", name:"New Zealand", gp:2, w:0, d:1, l:1, f:3, a:5, gd:"-2", pts:1, status:"alive",
-        note:"Must beat Belgium and need Iran to lose to have any chance." }
+      { flag:"🇧🇪", name:"Belgium", gp:3, w:1, d:2, l:0, f:6, a:2, gd:"+4", pts:5, status:"qualified" },
+      { flag:"🇪🇬", name:"Egypt", gp:3, w:1, d:2, l:0, f:5, a:3, gd:"+2", pts:5, status:"qualified" },
+      { flag:"🇮🇷", name:"Iran", gp:3, w:0, d:3, l:0, f:3, a:3, gd:"0", pts:3, status:"alive",
+        note:"Finished 3rd at 3pts (GD 0). Advances if among the 8 best 3rd-place teams." },
+      { flag:"🇳🇿", name:"New Zealand", gp:3, w:0, d:1, l:2, f:4, a:10, gd:"-6", pts:1, status:"eliminated" }
     ]
   },
   {
