@@ -50,6 +50,7 @@
       font-weight: 500;
     }
 
+    .nav-buttons { display: flex; gap: 10px; }
     .nav-btn {
       background: var(--gold);
       color: var(--navy);
@@ -63,11 +64,34 @@
       display: inline-block;
       letter-spacing: 0.3px;
       transition: background 0.15s;
-      min-width: 148px;
+      white-space: nowrap;
       text-align: center;
     }
 
     .nav-btn:hover { background: #f5d020; }
+
+    .hamburger {
+      display: none; position: relative;
+      font-size: 1.4rem; cursor: pointer;
+      background: none; border: none; color: var(--gold);
+      padding: 4px 8px; border-radius: 4px; line-height: 1;
+    }
+    .nav-dropdown {
+      display: none; position: absolute; top: calc(100% + 10px); right: 0;
+      background: var(--navy); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+      min-width: 170px; z-index: 100; overflow: hidden;
+    }
+    .nav-dropdown a {
+      display: block; padding: 13px 16px;
+      color: #fff; text-decoration: none; font-weight: 600; font-size: 0.88rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.12s;
+    }
+    .nav-dropdown a:last-child { border-bottom: none; }
+    .nav-dropdown a:hover { background: rgba(255,255,255,0.1); }
+    .nav-dropdown a.active { color: var(--gold); }
+    .nav-dropdown.open { display: block; }
 
     .legend {
       display: flex;
@@ -247,11 +271,15 @@
     tr.note-row:last-child td { border-bottom: none; }
     tr.data-row:last-child td { border-bottom: none; }
 
+    @media (max-width: 900px) {
+      .nav-buttons { display: none; }
+      .hamburger { display: block; }
+    }
+
     @media (max-width: 900px) and (orientation: portrait) {
       .subtitle-sep { display: none; }
       .subtitle-date { display: block; }
       .header-left h1 { white-space: nowrap; font-size: 1rem; }
-      .nav-btn { white-space: nowrap; }
       .container { padding: 12px; }
       .groups-grid { grid-template-columns: 1fr; gap: 12px; }
       thead th { padding: 4px 4px; font-size: 0.63rem; }
@@ -319,7 +347,17 @@
     <h1>2026 FIFA World Cup</h1>
     <div class="subtitle">Group Stage Standings<span class="subtitle-sep"> &nbsp;·&nbsp; </span><span class="subtitle-date">Updated Jun 28, 2026</span></div>
   </div>
-  <a href="bracket.html" class="nav-btn">View Bracket</a>
+  <div class="nav-buttons">
+    <a href="bracket.html" class="nav-btn">Bracket</a>
+    <a href="pickem.html" class="nav-btn">Pick'em</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Navigation menu">&#9776;
+    <div class="nav-dropdown" id="navDropdown">
+      <a href="groups.html" class="active">Group Stage</a>
+      <a href="bracket.html">Bracket</a>
+      <a href="pickem.html">Pick'em</a>
+    </div>
+  </button>
 </header>
 
 <div class="legend">
@@ -677,6 +715,14 @@ const tpqQualified = new Set(_tpqThirds.filter(team => {
 
 render();
 renderTPQ();
+
+document.getElementById('hamburger').addEventListener('click', function(e) {
+  e.stopPropagation();
+  document.getElementById('navDropdown').classList.toggle('open');
+});
+document.addEventListener('click', () => {
+  document.getElementById('navDropdown').classList.remove('open');
+});
 </script>
 </body>
 </html>

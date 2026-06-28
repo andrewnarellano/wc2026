@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>2026 FIFA World Cup — Pick'em</title>
+  <style>
+    :root { --navy: #003277; --gold: #E8C21A; --gray: #4A5567; --green: #22c55e; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { background: #003277; -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body {
+      background: linear-gradient(135deg, #003277 0%, #0058C7 50%, #0176FF 100%);
+      min-height: 100vh;
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      color: #fff;
+    }
+
+    /* ── Header ── */
+    header {
+      background: var(--navy); padding: 14px 24px;
+      display: flex; align-items: center; justify-content: space-between;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.4); position: sticky; top: 0; z-index: 10;
+    }
+    .header-left h1 { font-size: 1.15rem; font-weight: 800; letter-spacing: 0.5px; }
+    .header-left .subtitle { font-size: 0.75rem; color: var(--gold); margin-top: 2px; font-weight: 500; }
+
+    .nav-buttons { display: flex; gap: 10px; }
+    .nav-btn {
+      background: var(--gold); color: var(--navy); border: none;
+      padding: 9px 18px; border-radius: 6px; font-weight: 800; font-size: 0.82rem;
+      cursor: pointer; text-decoration: none; display: inline-block; letter-spacing: 0.3px;
+      transition: background 0.15s; white-space: nowrap; text-align: center;
+    }
+    .nav-btn:hover { background: #f5d020; }
+
+    /* ── Hamburger (mobile only) ── */
+    .hamburger {
+      display: none; position: relative;
+      font-size: 1.4rem; cursor: pointer;
+      background: none; border: none; color: var(--gold);
+      padding: 4px 8px; border-radius: 4px; line-height: 1;
+    }
+    .nav-dropdown {
+      display: none; position: absolute; top: calc(100% + 10px); right: 0;
+      background: var(--navy); border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+      min-width: 170px; z-index: 100; overflow: hidden;
+    }
+    .nav-dropdown a {
+      display: block; padding: 13px 16px;
+      color: #fff; text-decoration: none; font-weight: 600; font-size: 0.88rem;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+      transition: background 0.12s;
+    }
+    .nav-dropdown a:last-child { border-bottom: none; }
+    .nav-dropdown a:hover { background: rgba(255,255,255,0.1); }
+    .nav-dropdown a.active { color: var(--gold); }
+    .nav-dropdown.open { display: block; }
+
+    @media (max-width: 900px) {
+      .nav-buttons { display: none; }
+      .hamburger { display: block; }
+      header { padding: 12px 16px; }
+      .header-left h1 { font-size: 1rem; }
+    }
+
+    /* ── Content ── */
+    .content { padding: 28px 20px 56px; max-width: 680px; margin: 0 auto; }
+
+    .no-matches {
+      text-align: center; padding: 80px 20px;
+      color: rgba(255,255,255,0.45); font-size: 1rem; line-height: 1.6;
+    }
+
+    /* ── Pick block (tile + table) ── */
+    .pick-block { margin-bottom: 36px; }
+
+    .pick-tile {
+      background: var(--navy); border-radius: 10px;
+      box-shadow: 0 3px 14px rgba(0,0,0,0.4);
+      overflow: hidden; margin-bottom: 10px;
+    }
+
+    .pick-header {
+      background: rgba(0,0,0,0.35); padding: 8px 14px;
+      display: flex; align-items: center; justify-content: space-between;
+      border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .pick-match-num { font-size: 0.62rem; font-weight: 800; color: var(--gold); letter-spacing: 0.8px; }
+    .pick-match-dt  { font-size: 0.6rem; color: rgba(255,255,255,0.55); }
+
+    .pick-body { padding: 16px 14px 14px; }
+
+    /* Score row: [input] [flag name] VS [flag name] [input] */
+    .score-row {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .score-input {
+      width: 54px; height: 46px; border-radius: 7px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.22);
+      color: #fff; font-size: 1.15rem; font-weight: 800; text-align: center;
+      outline: none; flex-shrink: 0;
+      transition: border-color 0.15s, background 0.15s;
+      -moz-appearance: textfield;
+    }
+    .score-input::-webkit-inner-spin-button,
+    .score-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .score-input:focus { border-color: var(--gold); background: rgba(232,194,26,0.1); }
+
+    .team-side {
+      display: flex; align-items: center; gap: 8px;
+      flex: 1; min-width: 0;
+    }
+    .team-side.right { flex-direction: row-reverse; text-align: right; }
+    .team-flag-lg { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+    .team-name-lg {
+      font-size: 0.88rem; font-weight: 700;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .tbd-team { color: rgba(255,255,255,0.35); font-style: italic; font-weight: 400; }
+
+    .vs-sep {
+      font-size: 0.7rem; font-weight: 800; color: rgba(255,255,255,0.28);
+      letter-spacing: 1px; flex-shrink: 0;
+    }
+
+    /* PK row — hidden until draw detected */
+    .pk-row {
+      display: none; align-items: center; gap: 10px;
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+    }
+    .pk-row.visible { display: flex; }
+    .pk-label {
+      flex: 1; text-align: center;
+      font-size: 0.68rem; font-weight: 700; letter-spacing: 0.4px;
+      color: rgba(255,255,255,0.45); white-space: nowrap;
+    }
+    .pk-input {
+      width: 54px; height: 42px; border-radius: 7px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+      color: #fff; font-size: 1.05rem; font-weight: 700; text-align: center;
+      outline: none; flex-shrink: 0;
+      transition: border-color 0.15s;
+      -moz-appearance: textfield;
+    }
+    .pk-input::-webkit-inner-spin-button,
+    .pk-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+    .pk-input:focus { border-color: var(--gold); }
+
+    /* Footer: venue + submit */
+    .pick-footer {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-top: 14px; padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.07);
+      gap: 12px;
+    }
+    .pick-venue {
+      font-size: 0.62rem; font-weight: 500;
+      color: rgba(232,194,26,0.65);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      flex: 1;
+    }
+    .submit-btn {
+      background: var(--gold); color: var(--navy); border: none;
+      padding: 9px 20px; border-radius: 6px; font-weight: 800; font-size: 0.82rem;
+      cursor: pointer; white-space: nowrap; flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .submit-btn:hover { background: #f5d020; }
+
+    /* ── Picks table ── */
+    .picks-table-wrap {
+      background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden;
+    }
+    .picks-table-wrap.hidden { display: none; }
+    .picks-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+    .picks-table thead th {
+      background: rgba(0,0,0,0.3); padding: 8px 12px;
+      text-align: left; font-size: 0.6rem; font-weight: 800;
+      letter-spacing: 0.7px; color: rgba(255,255,255,0.45);
+      text-transform: uppercase;
+    }
+    .picks-table tbody td {
+      padding: 9px 12px; border-bottom: 1px solid rgba(255,255,255,0.05);
+      font-weight: 500; vertical-align: middle;
+    }
+    .picks-table tbody tr:last-child td { border-bottom: none; }
+    .picks-table tbody tr:hover td { background: rgba(255,255,255,0.03); }
+    .picked-winner { color: var(--green); font-weight: 700; }
+
+    /* ── Modal ── */
+    .modal-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.68); z-index: 200;
+      align-items: center; justify-content: center; padding: 20px;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: #0d2d6b; border-radius: 12px;
+      padding: 28px 24px; width: 340px; max-width: 100%;
+      box-shadow: 0 16px 48px rgba(0,0,0,0.65);
+    }
+    .modal h2 { font-size: 1.05rem; font-weight: 800; margin-bottom: 4px; }
+    .modal-sub { font-size: 0.73rem; color: rgba(255,255,255,0.5); margin-bottom: 22px; }
+    .modal-fields { display: flex; gap: 10px; margin-bottom: 22px; }
+    .modal-field { flex: 1; }
+    .modal-field.narrow { flex: 0 0 80px; }
+    .modal-field label {
+      display: block; font-size: 0.62rem; font-weight: 800; letter-spacing: 0.6px;
+      color: rgba(255,255,255,0.45); margin-bottom: 6px; text-transform: uppercase;
+    }
+    .modal-field input {
+      width: 100%; padding: 10px 11px; border-radius: 6px;
+      background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; font-size: 0.92rem; font-weight: 600; outline: none;
+      transition: border-color 0.15s;
+    }
+    .modal-field input:focus { border-color: var(--gold); }
+    .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-cancel {
+      background: rgba(255,255,255,0.1); color: #fff; border: none;
+      padding: 9px 16px; border-radius: 6px; font-weight: 700; font-size: 0.82rem;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .modal-cancel:hover { background: rgba(255,255,255,0.18); }
+    .modal-confirm {
+      background: var(--gold); color: var(--navy); border: none;
+      padding: 9px 20px; border-radius: 6px; font-weight: 800; font-size: 0.82rem;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .modal-confirm:hover { background: #f5d020; }
+
+    @media (max-width: 900px) {
+      .content { padding: 18px 12px 48px; }
+      .score-input { width: 48px; height: 42px; font-size: 1.05rem; }
+      .pk-input { width: 48px; height: 38px; font-size: 0.95rem; }
+      .team-name-lg { font-size: 0.8rem; }
+      .score-row { gap: 7px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-left">
+    <h1>2026 FIFA World Cup</h1>
+    <div class="subtitle">Pick'em</div>
+  </div>
+  <div class="nav-buttons">
+    <a href="groups.html" class="nav-btn">Group Stage</a>
+    <a href="bracket.html" class="nav-btn">Bracket</a>
+  </div>
+  <button class="hamburger" id="hamburger" aria-label="Navigation menu">&#9776;
+    <div class="nav-dropdown" id="navDropdown">
+      <a href="groups.html">Group Stage</a>
+      <a href="bracket.html">Bracket</a>
+      <a href="pickem.html" class="active">Pick'em</a>
+    </div>
+  </button>
+</header>
+
+<div class="content" id="content"></div>
+
+<!-- Name modal -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2>Enter your name</h2>
+    <p class="modal-sub">Your pick will be logged below the match.</p>
+    <div class="modal-fields">
+      <div class="modal-field">
+        <label>First Name</label>
+        <input type="text" id="modalFirst" placeholder="First" maxlength="24" autocomplete="off">
+      </div>
+      <div class="modal-field narrow">
+        <label>Last Initial</label>
+        <input type="text" id="modalLast" placeholder="L" maxlength="1" autocomplete="off">
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="modal-cancel" id="modalCancel">Cancel</button>
+      <button class="modal-confirm" id="modalConfirm">Submit Pick</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── Match data — kept in sync with bracket.html by update.js ─────────────────
+const r32Pairs = [
+  { r16num:89, matches:[
+    { num:74,  date:"Jun 29", time:"2:30 PM CT",  venue:"Gillette Stadium · Foxborough MA",
+      t1:{flag:"🇩🇪",name:"Germany"},          t2:{flag:"🇵🇾",name:"Paraguay"},    winner:null,score:null },
+    { num:77,  date:"Jun 30", time:"3:00 PM CT",  venue:"MetLife Stadium · E. Rutherford NJ",
+      t1:{flag:"🇫🇷",name:"France"},            t2:{flag:"🇸🇪",name:"Sweden"},      winner:null,score:null },
+  ]},
+  { r16num:90, matches:[
+    { num:73,  date:"Jun 28", time:"1:00 PM CT",  venue:"SoFi Stadium · Inglewood CA",
+      t1:{flag:"🇨🇦",name:"Canada"},            t2:{flag:"🇿🇦",name:"South Africa"}, winner:null,score:null },
+    { num:75,  date:"Jun 29", time:"7:00 PM CT",  venue:"Estadio BBVA · Guadalupe MX",
+      t1:{flag:"🇳🇱",name:"Netherlands"},       t2:{flag:"🇲🇦",name:"Morocco"},      winner:null,score:null },
+  ]},
+  { r16num:93, matches:[
+    { num:84,  date:"Jul 2",  time:"1:00 PM CT",  venue:"SoFi Stadium · Inglewood CA",
+      t1:{flag:"🇪🇸",name:"Spain"},             t2:{flag:"🇦🇹",name:"Austria"},      winner:null,score:null },
+    { num:83,  date:"Jul 2",  time:"5:00 PM CT",  venue:"BMO Field · Toronto ON",
+      t1:{flag:"🇵🇹",name:"Portugal"},           t2:{flag:"🇭🇷",name:"Croatia"},      winner:null,score:null },
+  ]},
+  { r16num:94, matches:[
+    { num:82,  date:"Jul 1",  time:"2:00 PM CT",  venue:"Lumen Field · Seattle WA",
+      t1:{flag:"🇧🇪",name:"Belgium"},            t2:{flag:"🇸🇳",name:"Senegal"},      winner:null,score:null },
+    { num:81,  date:"Jul 1",  time:"6:00 PM CT",  venue:"Levi's Stadium · Santa Clara CA",
+      t1:{flag:"🇺🇸",name:"United States"},     t2:{flag:"🇧🇦",name:"Bosnia-Herzegovina"}, winner:null,score:null },
+  ]},
+  { r16num:91, matches:[
+    { num:76,  date:"Jun 29", time:"11:00 AM CT", venue:"NRG Stadium · Houston TX",
+      t1:{flag:"🇧🇷",name:"Brazil"},             t2:{flag:"🇯🇵",name:"Japan"},        winner:null,score:null },
+    { num:78,  date:"Jun 30", time:"11:00 AM CT", venue:"AT&T Stadium · Arlington TX",
+      t1:{flag:"🇨🇮",name:"Ivory Coast"},        t2:{flag:"🇳🇴",name:"Norway"},       winner:null,score:null },
+  ]},
+  { r16num:92, matches:[
+    { num:79,  date:"Jun 30", time:"7:00 PM CT",  venue:"Estadio Banorte · Mexico City",
+      t1:{flag:"🇲🇽",name:"Mexico"},             t2:{flag:"🇪🇨",name:"Ecuador"},      winner:null,score:null },
+    { num:80,  date:"Jul 1",  time:"10:00 AM CT", venue:"Mercedes-Benz Stadium · Atlanta GA",
+      t1:{flag:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",name:"England"},            t2:{flag:"🇨🇩",name:"Congo DR"},     winner:null,score:null },
+  ]},
+  { r16num:95, matches:[
+    { num:86,  date:"Jul 3",  time:"4:00 PM CT",  venue:"Hard Rock Stadium · Miami Gardens FL",
+      t1:{flag:"🇦🇷",name:"Argentina"},          t2:{flag:"🇨🇻",name:"Cape Verde"},   winner:null,score:null },
+    { num:88,  date:"Jul 3",  time:"12:00 PM CT", venue:"AT&T Stadium · Arlington TX",
+      t1:{flag:"🇦🇺",name:"Australia"},           t2:{flag:"🇪🇬",name:"Egypt"},        winner:null,score:null },
+  ]},
+  { r16num:96, matches:[
+    { num:85,  date:"Jul 2",  time:"9:00 PM CT",  venue:"BC Place · Vancouver BC",
+      t1:{flag:"🇨🇭",name:"Switzerland"},        t2:{flag:"🇩🇿",name:"Algeria"},      winner:null,score:null },
+    { num:87,  date:"Jul 3",  time:"7:30 PM CT",  venue:"Arrowhead Stadium · Kansas City MO",
+      t1:{flag:"🇨🇴",name:"Colombia"},           t2:{flag:"🇬🇭",name:"Ghana"},        winner:null,score:null },
+  ]},
+];
+
+const r16 = [
+  { num:89, date:"Jul 4",  time:"3:00 PM CT",  venue:"NRG Stadium · Houston TX",
+    t1:{flag:"",name:"W74"}, t2:{flag:"",name:"W77"}, winner:null,score:null },
+  { num:90, date:"Jul 4",  time:"11:00 AM CT", venue:"Lincoln Financial Field · Philadelphia PA",
+    t1:{flag:"",name:"W73"}, t2:{flag:"",name:"W75"}, winner:null,score:null },
+  { num:93, date:"Jul 6",  time:"1:00 PM CT",  venue:"AT&T Stadium · Arlington TX",
+    t1:{flag:"",name:"W84"}, t2:{flag:"",name:"W83"}, winner:null,score:null },
+  { num:94, date:"Jul 6",  time:"6:00 PM CT",  venue:"Lumen Field · Seattle WA",
+    t1:{flag:"",name:"W82"}, t2:{flag:"",name:"W81"}, winner:null,score:null },
+  { num:91, date:"Jul 5",  time:"2:00 PM CT",  venue:"MetLife Stadium · E. Rutherford NJ",
+    t1:{flag:"",name:"W76"}, t2:{flag:"",name:"W78"}, winner:null,score:null },
+  { num:92, date:"Jul 5",  time:"6:00 PM CT",  venue:"Estadio Banorte · Mexico City",
+    t1:{flag:"",name:"W79"}, t2:{flag:"",name:"W80"}, winner:null,score:null },
+  { num:95, date:"Jul 7",  time:"10:00 AM CT", venue:"Mercedes-Benz Stadium · Atlanta GA",
+    t1:{flag:"",name:"W86"}, t2:{flag:"",name:"W88"}, winner:null,score:null },
+  { num:96, date:"Jul 7",  time:"2:00 PM CT",  venue:"BC Place · Vancouver BC",
+    t1:{flag:"",name:"W85"}, t2:{flag:"",name:"W87"}, winner:null,score:null },
+];
+
+const qf = [
+  { num:97,  date:"Jul 9",  time:"2:00 PM CT",  venue:"Gillette Stadium · Foxborough MA",
+    t1:{flag:"",name:"W89"}, t2:{flag:"",name:"W90"}, winner:null,score:null },
+  { num:98,  date:"Jul 10", time:"1:00 PM CT",  venue:"SoFi Stadium · Inglewood CA",
+    t1:{flag:"",name:"W93"}, t2:{flag:"",name:"W94"}, winner:null,score:null },
+  { num:99,  date:"Jul 11", time:"3:00 PM CT",  venue:"Hard Rock Stadium · Miami Gardens FL",
+    t1:{flag:"",name:"W91"}, t2:{flag:"",name:"W92"}, winner:null,score:null },
+  { num:100, date:"Jul 11", time:"7:00 PM CT",  venue:"Arrowhead Stadium · Kansas City MO",
+    t1:{flag:"",name:"W95"}, t2:{flag:"",name:"W96"}, winner:null,score:null },
+];
+
+const sf = [
+  { num:101, date:"Jul 14", time:"1:00 PM CT", venue:"AT&T Stadium · Arlington TX",
+    t1:{flag:"",name:"W97"}, t2:{flag:"",name:"W98"}, winner:null,score:null },
+  { num:102, date:"Jul 15", time:"1:00 PM CT", venue:"Mercedes-Benz Stadium · Atlanta GA",
+    t1:{flag:"",name:"W99"}, t2:{flag:"",name:"W100"}, winner:null,score:null },
+];
+
+const finalMatch = {
+  num:104, date:"Jul 19", time:"1:00 PM CT", venue:"MetLife Stadium · E. Rutherford NJ",
+  t1:{flag:"",name:"W101"}, t2:{flag:"",name:"W102"}, winner:null,score:null
+};
+const thirdPlace = {
+  num:103, date:"Jul 18", time:"3:00 PM CT", venue:"Hard Rock Stadium · Miami Gardens FL",
+  t1:{flag:"",name:"L101"}, t2:{flag:"",name:"L102"}, winner:null,score:null
+};
+
+// ── Collect all matches and filter to today ───────────────────────────────────
+const allMatches = [
+  ...r32Pairs.flatMap(p => p.matches),
+  ...r16, ...qf, ...sf, finalMatch, thirdPlace
+];
+
+const todayLabel = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric' });
+const todayMatches = allMatches
+  .filter(m => m.date === todayLabel)
+  .sort((a, b) => {
+    const t = s => { const [h,m] = s.split(':'); return parseInt(h)*60+parseInt(m); };
+    return t(a.time) - t(b.time);
+  });
+
+// ── Render ────────────────────────────────────────────────────────────────────
+const content = document.getElementById('content');
+
+function isTbd(name) {
+  return /^(W|L)\d+$/.test(name) || /^(1st|2nd|3rd)\s/i.test(name);
+}
+
+if (todayMatches.length === 0) {
+  content.innerHTML = `<div class="no-matches">No matches scheduled for today.<br>Check back on matchday.</div>`;
+} else {
+  todayMatches.forEach(m => {
+    const block = document.createElement('div');
+    block.className = 'pick-block';
+    block.dataset.matchNum = m.num;
+    block.innerHTML = buildBlock(m);
+    content.appendChild(block);
+    wireBlock(block, m);
+    renderTable(block, m.num);
+  });
+}
+
+function buildBlock(m) {
+  const t1Tbd = isTbd(m.t1.name);
+  const t2Tbd = isTbd(m.t2.name);
+  return `
+    <div class="pick-tile">
+      <div class="pick-header">
+        <span class="pick-match-num">MATCH ${m.num}</span>
+        <span class="pick-match-dt">${m.date} &middot; ${m.time}</span>
+      </div>
+      <div class="pick-body">
+        <div class="score-row">
+          <input class="score-input" id="s1_${m.num}" type="number" min="0" max="99" placeholder="0">
+          <div class="team-side">
+            <span class="team-flag-lg">${m.t1.flag}</span>
+            <span class="team-name-lg${t1Tbd?' tbd-team':''}">${m.t1.name}</span>
+          </div>
+          <span class="vs-sep">VS</span>
+          <div class="team-side right">
+            <span class="team-name-lg${t2Tbd?' tbd-team':''}">${m.t2.name}</span>
+            <span class="team-flag-lg">${m.t2.flag}</span>
+          </div>
+          <input class="score-input" id="s2_${m.num}" type="number" min="0" max="99" placeholder="0">
+        </div>
+        <div class="pk-row" id="pkrow_${m.num}">
+          <input class="pk-input" id="pk1_${m.num}" type="number" min="0" max="99" placeholder="0">
+          <span class="pk-label">Penalty Kicks</span>
+          <input class="pk-input" id="pk2_${m.num}" type="number" min="0" max="99" placeholder="0">
+        </div>
+        <div class="pick-footer">
+          <span class="pick-venue">${m.venue}</span>
+          <button class="submit-btn" data-match="${m.num}">Submit Pick</button>
+        </div>
+      </div>
+    </div>
+    <div class="picks-table-wrap hidden" id="table_${m.num}">
+      <table class="picks-table">
+        <thead><tr>
+          <th>Name</th><th>Picked Winner</th><th>Score</th>
+        </tr></thead>
+        <tbody id="tbody_${m.num}"></tbody>
+      </table>
+    </div>`;
+}
+
+function wireBlock(block, m) {
+  const s1    = block.querySelector(`#s1_${m.num}`);
+  const s2    = block.querySelector(`#s2_${m.num}`);
+  const pkRow = block.querySelector(`#pkrow_${m.num}`);
+
+  function checkDraw() {
+    const v1 = s1.value.trim(), v2 = s2.value.trim();
+    const isDraw = v1 !== '' && v2 !== '' && v1 === v2;
+    pkRow.classList.toggle('visible', isDraw);
+  }
+
+  s1.addEventListener('input', checkDraw);
+  s2.addEventListener('input', checkDraw);
+
+  block.querySelector('.submit-btn').addEventListener('click', () => openModal(m, block));
+}
+
+// ── Modal ─────────────────────────────────────────────────────────────────────
+let pending = null;
+
+function openModal(m, block) {
+  const s1  = block.querySelector(`#s1_${m.num}`);
+  const s2  = block.querySelector(`#s2_${m.num}`);
+  const pk1 = block.querySelector(`#pk1_${m.num}`);
+  const pk2 = block.querySelector(`#pk2_${m.num}`);
+
+  const score1 = parseInt(s1.value);
+  const score2 = parseInt(s2.value);
+  if (isNaN(score1) || isNaN(score2)) { alert('Please enter scores for both teams.'); return; }
+
+  const isDraw = score1 === score2;
+  let pk1Val = null, pk2Val = null;
+  if (isDraw) {
+    pk1Val = parseInt(pk1.value);
+    pk2Val = parseInt(pk2.value);
+    if (isNaN(pk1Val) || isNaN(pk2Val)) { alert('Scores are tied — please enter penalty kick scores.'); return; }
+  }
+
+  pending = { m, block, score1, score2, pk1Val, pk2Val };
+  document.getElementById('modalFirst').value = '';
+  document.getElementById('modalLast').value  = '';
+  document.getElementById('modalOverlay').classList.add('open');
+  setTimeout(() => document.getElementById('modalFirst').focus(), 80);
+}
+
+function confirmPick() {
+  const first = document.getElementById('modalFirst').value.trim();
+  const last  = document.getElementById('modalLast').value.trim().toUpperCase();
+  if (!first) { alert('Please enter your first name.'); return; }
+  if (!last)  { alert('Please enter your last initial.'); return; }
+
+  const { m, block, score1, score2, pk1Val, pk2Val } = pending;
+  const isDraw = score1 === score2;
+
+  let winnerTeam, scoreStr;
+  if (!isDraw) {
+    winnerTeam = score1 > score2 ? m.t1 : m.t2;
+    scoreStr   = `${score1}–${score2}`;
+  } else {
+    winnerTeam = pk1Val > pk2Val ? m.t1 : pk2Val > pk1Val ? m.t2 : null;
+    scoreStr   = `${score1}–${score2} (PK ${pk1Val}–${pk2Val})`;
+  }
+
+  const entry = {
+    name:   `${first} ${last}.`,
+    winner: winnerTeam ? `${winnerTeam.flag} ${winnerTeam.name}` : 'Draw',
+    score:  scoreStr,
+    ts:     Date.now(),
+  };
+
+  const key  = `picks_match_${m.num}`;
+  const list = JSON.parse(localStorage.getItem(key) || '[]');
+  list.push(entry);
+  localStorage.setItem(key, JSON.stringify(list));
+
+  document.getElementById('modalOverlay').classList.remove('open');
+  pending = null;
+  renderTable(block, m.num);
+}
+
+document.getElementById('modalCancel').addEventListener('click', () => {
+  document.getElementById('modalOverlay').classList.remove('open');
+  pending = null;
+});
+document.getElementById('modalConfirm').addEventListener('click', confirmPick);
+document.getElementById('modalFirst').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('modalLast').focus();
+});
+document.getElementById('modalLast').addEventListener('keydown', e => {
+  if (e.key === 'Enter') confirmPick();
+});
+
+// ── Table render ──────────────────────────────────────────────────────────────
+function renderTable(block, matchNum) {
+  const picks = JSON.parse(localStorage.getItem(`picks_match_${matchNum}`) || '[]');
+  const wrap  = block.querySelector(`#table_${matchNum}`);
+  const tbody = block.querySelector(`#tbody_${matchNum}`);
+  if (!wrap || !tbody) return;
+  if (picks.length === 0) { wrap.classList.add('hidden'); return; }
+  wrap.classList.remove('hidden');
+  tbody.innerHTML = picks.map(p => `
+    <tr>
+      <td>${p.name}</td>
+      <td class="picked-winner">${p.winner}</td>
+      <td>${p.score}</td>
+    </tr>`).join('');
+}
+
+// ── Hamburger ─────────────────────────────────────────────────────────────────
+document.getElementById('hamburger').addEventListener('click', function(e) {
+  e.stopPropagation();
+  document.getElementById('navDropdown').classList.toggle('open');
+});
+document.addEventListener('click', () => {
+  document.getElementById('navDropdown').classList.remove('open');
+});
+</script>
+</body>
+</html>
