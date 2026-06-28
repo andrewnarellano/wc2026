@@ -38,6 +38,7 @@
     .legend-dot { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
     .dot-green { background: var(--green); }
     .dot-tbd { background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.35); }
+    .dot-matchday { background: transparent; border: 1.5px solid var(--green); box-shadow: 0 0 6px 1px rgba(34,197,94,0.6); }
 
     .bracket-scroll { overflow-x: auto; padding: 24px 20px 48px; -webkit-overflow-scrolling: touch; }
     .bracket-wrap { display: flex; align-items: flex-start; min-width: 1380px; }
@@ -218,6 +219,7 @@
 
 <div class="legend">
   <div class="legend-item"><div class="legend-dot dot-green"></div> Winner</div>
+  <div class="legend-item"><div class="legend-dot dot-matchday"></div> Matchday</div>
 </div>
 
 <div class="scroll-hint">← swipe to see full bracket →</div>
