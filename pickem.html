@@ -603,6 +603,20 @@ function confirmPick() {
   list.push(entry);
   localStorage.setItem(key, JSON.stringify(list));
 
+  // Send pick to Google Sheet
+  const pkStr = isDraw ? `PK ${pk1Val}–${pk2Val}` : '';
+  const params = new URLSearchParams({
+    matchNum:  m.num,
+    matchup:   `${m.t1.name} vs ${m.t2.name}`,
+    matchDate: `${m.date} · ${m.time}`,
+    name:      entry.name,
+    winner:    winnerTeam ? winnerTeam.name : 'Draw',
+    score:     scoreStr,
+    pk:        pkStr,
+  });
+  fetch(`https://script.google.com/macros/s/AKfycbzIThrmTDRv3B3yDjaRMRf_pneLPWyzUb5KjP82Q3Vk1LN2YzrWrrcTWbPL9QIKKorQ/exec?${params}`)
+    .catch(() => {}); // fire-and-forget; don't block the UI
+
   document.getElementById('modalOverlay').classList.remove('open');
   pending = null;
   renderTable(block, m.num);
