@@ -613,8 +613,14 @@ function renderTPQ() {
     if (i === 8) row.classList.add('tpq-cutoff');
 
     const qualified = isQualified(t);
-    const pill = qualified ? '<span class="status-badge badge-in tpq-badge"><span class="badge-desktop">ADVANCED</span><span class="badge-mobile">A</span></span>' : '';
+    const eliminated = i >= 8;
+    const pill = qualified
+      ? '<span class="status-badge badge-in tpq-badge"><span class="badge-desktop">ADVANCED</span><span class="badge-mobile">A</span></span>'
+      : eliminated
+      ? '<span class="status-badge badge-out tpq-badge"><span class="badge-desktop">OUT</span><span class="badge-mobile">O</span></span>'
+      : '';
     if (qualified) row.classList.add('row-qualified');
+    if (eliminated) row.classList.add('row-eliminated');
 
     row.innerHTML = `
       <td style="text-align:center; color:rgba(255,255,255,0.45); font-size:0.75rem; font-weight:700">${t.group}</td>
