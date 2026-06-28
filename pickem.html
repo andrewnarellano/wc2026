@@ -233,12 +233,43 @@
     }
     .modal-confirm:hover { background: #f5d020; }
 
+    /* ── How to Play card (desktop only) ── */
+    .how-to-play {
+      background: rgba(0,0,0,0.22); border-radius: 10px;
+      padding: 20px 22px; margin-bottom: 28px;
+      border-left: 3px solid var(--gold);
+    }
+    .how-to-play h2 {
+      font-size: 0.75rem; font-weight: 800; letter-spacing: 0.8px;
+      text-transform: uppercase; color: var(--gold); margin-bottom: 14px;
+    }
+    .how-to-play ol {
+      list-style: none; padding: 0; margin: 0;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .how-to-play li {
+      display: flex; align-items: flex-start; gap: 12px;
+      font-size: 0.82rem; line-height: 1.5; color: rgba(255,255,255,0.85);
+    }
+    .htp-num {
+      background: var(--gold); color: var(--navy);
+      font-size: 0.65rem; font-weight: 800; border-radius: 50%;
+      width: 20px; height: 20px; display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .htp-note {
+      margin-top: 12px; padding-top: 12px;
+      border-top: 1px solid rgba(255,255,255,0.08);
+      font-size: 0.74rem; color: rgba(255,255,255,0.45); line-height: 1.5;
+    }
+
     @media (max-width: 900px) {
       .content { padding: 18px 12px 48px; }
       .score-input { width: 48px; height: 42px; font-size: 1.05rem; }
       .pk-input { width: 48px; height: 38px; font-size: 0.95rem; }
       .team-name-lg { font-size: 0.8rem; white-space: normal; overflow: visible; text-overflow: unset; }
       .score-row { gap: 7px; }
+      .how-to-play { display: none; }
     }
   </style>
 </head>
@@ -258,11 +289,35 @@
       <a href="groups.html">Group Stage</a>
       <a href="bracket.html">Bracket</a>
       <a href="pickem.html" class="active">Pick'em</a>
+      <a href="howtoplay.html">How to Play</a>
     </div>
   </button>
 </header>
 
-<div class="content" id="content"></div>
+<div class="content" id="content">
+  <div class="how-to-play">
+    <h2>How to Play</h2>
+    <ol>
+      <li>
+        <span class="htp-num">1</span>
+        <span>Enter the score you think each team will finish with using the boxes on either side of the matchup.</span>
+      </li>
+      <li>
+        <span class="htp-num">2</span>
+        <span>If you predict a tied score, penalty kick fields will appear automatically — enter how many PKs you think each team scores to pick the winner.</span>
+      </li>
+      <li>
+        <span class="htp-num">3</span>
+        <span>Hit <strong>Submit Pick</strong>, then enter your first name and last initial. Your pick is saved below the match for everyone to see.</span>
+      </li>
+      <li>
+        <span class="htp-num">4</span>
+        <span>The team with the higher score is your predicted winner. If you called a draw, the PK winner counts instead.</span>
+      </li>
+    </ol>
+    <p class="htp-note">Picks are saved locally in your browser. Everyone entering picks on the same device will see each other's entries in the table.</p>
+  </div>
+</div>
 
 <!-- Name modal -->
 <div class="modal-overlay" id="modalOverlay">
@@ -407,7 +462,10 @@ function isTbd(name) {
 }
 
 if (todayMatches.length === 0) {
-  content.innerHTML = `<div class="no-matches">No matches scheduled for today.<br>Check back on matchday.</div>`;
+  const msg = document.createElement('div');
+  msg.className = 'no-matches';
+  msg.innerHTML = 'No matches scheduled for today.<br>Check back on matchday.';
+  content.appendChild(msg);
 } else {
   todayMatches.forEach(m => {
     const block = document.createElement('div');
