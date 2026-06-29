@@ -273,7 +273,7 @@
       border-top: 1px solid rgba(255,255,255,0.07);
     }
     .tot-arrow { font-size: 0.55rem; transition: transform 0.2s; display: inline-block; }
-    .tot-toggle.open .tot-arrow { transform: rotate(180deg); }
+    .tot-toggle.open .tot-arrow { transform: rotate(90deg); }
     .tot-body { display: none; background: rgba(0,0,0,0.15); }
     .tot-body.open { display: block; }
     .tot-row {
@@ -563,7 +563,7 @@ function buildBlock(m) {
   const tot = (!t1Tbd && !t2Tbd && s1 && s2) ? `
     <button class="tot-toggle" id="tot-btn-${m.num}">
       <span>Tale of the Tape</span>
-      <span class="tot-arrow">▼</span>
+      <span class="tot-arrow">&#9654;</span>
     </button>
     <div class="tot-body" id="tot-${m.num}">
       <div class="tot-row">
