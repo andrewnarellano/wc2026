@@ -571,8 +571,14 @@ function isTbd(name) {
 
 function sortByTime(arr) {
   return arr.slice().sort((a, b) => {
-    const t = s => { const [h, mn] = s.split(':'); return parseInt(h) * 60 + parseInt(mn); };
-    return t(a.time) - t(b.time);
+    const toMins = s => {
+      const [timePart, ampm] = s.replace(' CT', '').trim().split(' ');
+      let [h, mn] = timePart.split(':').map(Number);
+      if (ampm === 'PM' && h !== 12) h += 12;
+      if (ampm === 'AM' && h === 12) h = 0;
+      return h * 60 + mn;
+    };
+    return toMins(a.time) - toMins(b.time);
   });
 }
 
