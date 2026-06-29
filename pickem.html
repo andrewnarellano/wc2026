@@ -635,7 +635,7 @@ function confirmPick() {
   document.getElementById('modalOverlay').classList.remove('open');
   pending = null;
   renderTable(m.num);
-  loadSheetPicks(m.num);
+  loadSheetPicks();
 }
 
 document.getElementById('modalCancel').addEventListener('click', () => {
@@ -668,14 +668,11 @@ function renderTable(matchNum, sheetPicks) {
     </tr>`).join('');
 }
 
-async function loadSheetPicks(filterMatchNum) {
+async function loadSheetPicks() {
   try {
     const res = await fetch(`${SHEET_URL}?action=read`);
     const all = await res.json();
-    const matchesToUpdate = filterMatchNum !== undefined
-      ? todayMatches.filter(m => String(m.num) === String(filterMatchNum))
-      : todayMatches;
-    matchesToUpdate.forEach(match => {
+    todayMatches.forEach(match => {
       const picks = all
         .filter(row => String(row['Match #']) === String(match.num))
         .map(row => {
