@@ -490,6 +490,7 @@ if (todayMatches.length === 0) {
     content.appendChild(block);
     wireBlock(block, m);
   });
+  loadSheetPicks();
 }
 
 function buildBlock(m) {
@@ -667,22 +668,26 @@ function renderTable(matchNum, sheetPicks) {
     </tr>`).join('');
 }
 
-async function loadSheetPicks(matchNum) {
+async function loadSheetPicks(filterMatchNum) {
   try {
     const res = await fetch(`${SHEET_URL}?action=read`);
     const all = await res.json();
-    const match = todayMatches.find(m => String(m.num) === String(matchNum));
-    const picks = all
-      .filter(row => String(row['Match #']) === String(matchNum))
-      .map(row => {
-        let winner = row['Picked Winner'];
-        if (match && winner !== 'Draw') {
-          if (winner === match.t1.name) winner = `${match.t1.flag} ${winner}`;
-          else if (winner === match.t2.name) winner = `${match.t2.flag} ${winner}`;
-        }
-        return { name: row['Name'], winner, score: row['Score '] };
-      });
-    renderTable(matchNum, picks);
+    const matchesToUpdate = filterMatchNum !== undefined
+      ? todayMatches.filter(m => String(m.num) === String(filterMatchNum))
+      : todayMatches;
+    matchesToUpdate.forEach(match => {
+      const picks = all
+        .filter(row => String(row['Match #']) === String(match.num))
+        .map(row => {
+          let winner = row['Picked Winner'];
+          if (winner !== 'Draw') {
+            if (winner === match.t1.name) winner = `${match.t1.flag} ${winner}`;
+            else if (winner === match.t2.name) winner = `${match.t2.flag} ${winner}`;
+          }
+          return { name: row['Name'], winner, score: row['Score '] };
+        });
+      renderTable(match.num, picks);
+    });
   } catch(e) {}
 }
 
