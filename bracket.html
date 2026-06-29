@@ -140,11 +140,23 @@
 
     /* ── Round columns ── */
     .round-col { display: flex; flex-direction: column; flex-shrink: 0; }
-    .round-label {
+    .round-label { visibility: hidden; height: 28px; }
+
+    /* ── Sticky round labels bar (outside bracket-scroll to avoid overflow-x scroll container) ── */
+    .round-labels-sticky {
+      position: sticky; top: 0; z-index: 6; overflow: hidden;
+      background: var(--navy); border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .round-labels-inner { display: flex; padding-left: 20px; }
+    .rl-item {
+      flex-shrink: 0; width: 210px;
       font-size: 0.7rem; font-weight: 800; letter-spacing: 1.2px; color: var(--gold);
       text-transform: uppercase; text-align: center; height: 28px;
-      display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
-      white-space: nowrap;
+      display: flex; align-items: center; justify-content: center; white-space: nowrap;
+    }
+    .rl-item + .rl-item { margin-left: 28px; }
+    @media (max-width: 900px) {
+      .round-labels-inner { padding-left: 12px; }
     }
     .round-matches { display: flex; flex-direction: column; }
 
@@ -258,6 +270,15 @@
   <div class="legend-item"><div class="legend-dot dot-matchday"></div> Matchday</div>
 </div>
 
+<div class="round-labels-sticky" id="roundLabelsBar">
+  <div class="round-labels-inner" id="roundLabelsInner">
+    <span class="rl-item">Round of 32</span>
+    <span class="rl-item">Round of 16</span>
+    <span class="rl-item">Quarterfinals</span>
+    <span class="rl-item">Semifinals</span>
+    <span class="rl-item">Final</span>
+  </div>
+</div>
 <div class="scroll-hint">← swipe to see full bracket →</div>
 <div class="bracket-scroll">
   <div class="bracket-wrap" id="bw"></div>
@@ -430,6 +451,21 @@ html += `<div class="round-col final-col">
 </div>`;
 
 bw.innerHTML = html;
+
+// ── Sticky round labels ───────────────────────────────────────────────────────
+const _labelsBar   = document.getElementById('roundLabelsBar');
+const _labelsInner = document.getElementById('roundLabelsInner');
+const _bScroll     = document.querySelector('.bracket-scroll');
+const _mainHeader  = document.querySelector('header');
+
+function _updateLabelTop() {
+  _labelsBar.style.top = _mainHeader.offsetHeight + 'px';
+}
+_updateLabelTop();
+window.addEventListener('resize', _updateLabelTop);
+_bScroll.addEventListener('scroll', function() {
+  _labelsInner.style.transform = `translateX(-${this.scrollLeft}px)`;
+});
 
 document.getElementById('hamburger').addEventListener('click', function(e) {
   e.stopPropagation();
