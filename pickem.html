@@ -620,7 +620,7 @@ function confirmPick() {
   document.getElementById('modalOverlay').classList.remove('open');
   pending = null;
   renderTable(m.num);
-  loadSheetPicks();
+  loadSheetPicks(m.num);
 }
 
 document.getElementById('modalCancel').addEventListener('click', () => {
@@ -653,23 +653,15 @@ function renderTable(matchNum, sheetPicks) {
     </tr>`).join('');
 }
 
-async function loadSheetPicks() {
+async function loadSheetPicks(matchNum) {
   try {
     const res = await fetch(`${SHEET_URL}?action=read`);
     const all = await res.json();
-    console.log('Sheet picks:', all);
-    const byMatch = {};
-    all.forEach(row => {
-      const mn = String(row['Match #']);
-      if (!byMatch[mn]) byMatch[mn] = [];
-      byMatch[mn].push({ name: row['Name'], winner: row['Picked Winner'], score: row['Score '] });
-    });
-    console.log('byMatch:', byMatch);
-    console.log('todayMatches nums:', todayMatches.map(m => String(m.num)));
-    todayMatches.forEach(m => {
-      renderTable(m.num, byMatch[String(m.num)] || []);
-    });
-  } catch(e) { console.error('loadSheetPicks error:', e); }
+    const picks = all
+      .filter(row => String(row['Match #']) === String(matchNum))
+      .map(row => ({ name: row['Name'], winner: row['Picked Winner'], score: row['Score '] }));
+    renderTable(matchNum, picks);
+  } catch(e) {}
 }
 
 // ── Hamburger ─────────────────────────────────────────────────────────────────
