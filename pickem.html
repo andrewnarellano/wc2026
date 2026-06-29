@@ -267,7 +267,7 @@
       .content { padding: 18px 12px 48px; }
       .score-input { width: 48px; height: 42px; font-size: 1.05rem; }
       .pk-input { width: 48px; height: 38px; font-size: 0.95rem; }
-      .team-name-lg { font-size: 0.8rem; white-space: normal; overflow: visible; text-overflow: unset; }
+      .team-name-lg { font-size: 0.8rem; white-space: normal; overflow: hidden; text-overflow: unset; word-break: break-word; }
       .score-row { gap: 7px; }
       .how-to-play { display: none; }
     }
@@ -473,8 +473,9 @@ if (todayMatches.length === 0) {
     block.innerHTML = buildBlock(m);
     content.appendChild(block);
     wireBlock(block, m);
-    renderTable(block, m.num);
+    renderTable(m.num);
   });
+  loadSheetPicks();
 }
 
 function buildBlock(m) {
@@ -609,7 +610,7 @@ function confirmPick() {
     matchup:   `${m.t1.name} vs ${m.t2.name}`,
     matchDate: `${m.date} · ${m.time}`,
     name:      entry.name,
-    winner:    winnerTeam ? winnerTeam.name : 'Draw',
+    winner:    winnerTeam ? `${winnerTeam.flag} ${winnerTeam.name}` : 'Draw',
     score:     scoreStr,
     pk:        pkStr,
   });
@@ -618,7 +619,8 @@ function confirmPick() {
 
   document.getElementById('modalOverlay').classList.remove('open');
   pending = null;
-  renderTable(block, m.num);
+  renderTable(m.num);
+  loadSheetPicks();
 }
 
 document.getElementById('modalCancel').addEventListener('click', () => {
@@ -634,10 +636,14 @@ document.getElementById('modalLast').addEventListener('keydown', e => {
 });
 
 // ── Table render ──────────────────────────────────────────────────────────────
-function renderTable(block, matchNum) {
-  const picks = JSON.parse(localStorage.getItem(`picks_match_${matchNum}`) || '[]');
-  const wrap  = block.querySelector(`#table_${matchNum}`);
-  const tbody = block.querySelector(`#tbody_${matchNum}`);
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzIThrmTDRv3B3yDjaRMRf_pneLPWyzUb5KjP82Q3Vk1LN2YzrWrrcTWbPL9QIKKorQ/exec';
+
+function renderTable(matchNum, sheetPicks) {
+  const picks = sheetPicks !== undefined
+    ? sheetPicks
+    : JSON.parse(localStorage.getItem(`picks_match_${matchNum}`) || '[]');
+  const wrap  = document.getElementById(`table_${matchNum}`);
+  const tbody = document.getElementById(`tbody_${matchNum}`);
   if (!wrap || !tbody) return;
   if (picks.length === 0) { wrap.classList.add('hidden'); return; }
   wrap.classList.remove('hidden');
@@ -647,6 +653,25 @@ function renderTable(block, matchNum) {
       <td class="picked-winner">${p.winner}</td>
       <td>${p.score}</td>
     </tr>`).join('');
+}
+
+async function loadSheetPicks() {
+  try {
+    const res = await fetch(`${SHEET_URL}?action=read`);
+    const all = await res.json();
+    console.log('Sheet picks:', all);
+    const byMatch = {};
+    all.forEach(row => {
+      const mn = String(row['Match #']);
+      if (!byMatch[mn]) byMatch[mn] = [];
+      byMatch[mn].push({ name: row['Name'], winner: row['Picked Winner'], score: row['Score '] });
+    });
+    console.log('byMatch:', byMatch);
+    console.log('todayMatches nums:', todayMatches.map(m => String(m.num)));
+    todayMatches.forEach(m => {
+      renderTable(m.num, byMatch[String(m.num)] || []);
+    });
+  } catch(e) { console.error('loadSheetPicks error:', e); }
 }
 
 // ── Hamburger ─────────────────────────────────────────────────────────────────
