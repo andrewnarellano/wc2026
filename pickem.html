@@ -263,6 +263,32 @@
       font-size: 0.74rem; color: rgba(255,255,255,0.45); line-height: 1.5;
     }
 
+    /* ── Tale of the Tape ── */
+    .tot-toggle {
+      width: 100%; padding: 9px 14px;
+      background: rgba(0,0,0,0.18); border: none;
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 0.62rem; font-weight: 800; letter-spacing: 1px;
+      color: rgba(255,255,255,0.45); text-transform: uppercase; cursor: pointer;
+      border-top: 1px solid rgba(255,255,255,0.07);
+    }
+    .tot-arrow { font-size: 0.55rem; transition: transform 0.2s; display: inline-block; }
+    .tot-toggle.open .tot-arrow { transform: rotate(180deg); }
+    .tot-body { display: none; background: rgba(0,0,0,0.15); }
+    .tot-body.open { display: block; }
+    .tot-row {
+      display: grid; grid-template-columns: 1fr auto 1fr;
+      align-items: center; padding: 7px 14px;
+      border-top: 1px solid rgba(255,255,255,0.04);
+    }
+    .tot-val { font-size: 0.78rem; font-weight: 700; color: #fff; }
+    .tot-val.right { text-align: right; }
+    .tot-label {
+      font-size: 0.58rem; font-weight: 700; letter-spacing: 0.5px;
+      color: rgba(255,255,255,0.38); text-transform: uppercase;
+      text-align: center; padding: 0 10px; white-space: nowrap;
+    }
+
     @media (max-width: 900px) {
       .content { padding: 18px 12px 48px; }
       .score-input { width: 48px; height: 42px; font-size: 1.05rem; }
@@ -455,6 +481,42 @@ const thirdPlace = {
 
 const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzIThrmTDRv3B3yDjaRMRf_pneLPWyzUb5KjP82Q3Vk1LN2YzrWrrcTWbPL9QIKKorQ/exec';
 
+// ── Team stats (group finish + tournament totals) ─────────────────────────────
+const TEAM_STATS = {
+  'Mexico':             { finish:'1st · Group A', w:3, d:0, l:0, gf:6,  ga:0  },
+  'South Africa':       { finish:'2nd · Group A', w:1, d:1, l:2, gf:2,  ga:4  },
+  'Switzerland':        { finish:'1st · Group B', w:2, d:1, l:0, gf:7,  ga:3  },
+  'Canada':             { finish:'2nd · Group B', w:2, d:1, l:1, gf:9,  ga:3  },
+  'Bosnia-Herzegovina': { finish:'3rd · Group B', w:1, d:1, l:1, gf:5,  ga:6  },
+  'Brazil':             { finish:'1st · Group C', w:2, d:1, l:0, gf:7,  ga:1  },
+  'Morocco':            { finish:'2nd · Group C', w:2, d:1, l:0, gf:6,  ga:3  },
+  'United States':      { finish:'1st · Group D', w:2, d:0, l:1, gf:8,  ga:4  },
+  'Australia':          { finish:'2nd · Group D', w:1, d:1, l:1, gf:2,  ga:2  },
+  'Paraguay':           { finish:'3rd · Group D', w:1, d:1, l:1, gf:2,  ga:4  },
+  'Germany':            { finish:'1st · Group E', w:2, d:0, l:1, gf:10, ga:4  },
+  'Ivory Coast':        { finish:'2nd · Group E', w:2, d:0, l:1, gf:4,  ga:2  },
+  'Ecuador':            { finish:'3rd · Group E', w:1, d:1, l:1, gf:2,  ga:2  },
+  'Netherlands':        { finish:'1st · Group F', w:2, d:1, l:0, gf:10, ga:4  },
+  'Japan':              { finish:'2nd · Group F', w:1, d:2, l:0, gf:7,  ga:3  },
+  'Sweden':             { finish:'3rd · Group F', w:1, d:1, l:1, gf:7,  ga:7  },
+  'Belgium':            { finish:'1st · Group G', w:1, d:2, l:0, gf:6,  ga:2  },
+  'Egypt':              { finish:'2nd · Group G', w:1, d:2, l:0, gf:5,  ga:3  },
+  'Spain':              { finish:'1st · Group H', w:2, d:1, l:0, gf:5,  ga:0  },
+  'Cape Verde':         { finish:'2nd · Group H', w:0, d:3, l:0, gf:2,  ga:2  },
+  'France':             { finish:'1st · Group I', w:3, d:0, l:0, gf:10, ga:2  },
+  'Norway':             { finish:'2nd · Group I', w:2, d:0, l:1, gf:8,  ga:7  },
+  'Senegal':            { finish:'3rd · Group I', w:1, d:0, l:2, gf:8,  ga:6  },
+  'Argentina':          { finish:'1st · Group J', w:3, d:0, l:0, gf:8,  ga:1  },
+  'Austria':            { finish:'2nd · Group J', w:1, d:1, l:1, gf:6,  ga:6  },
+  'Algeria':            { finish:'3rd · Group J', w:1, d:1, l:1, gf:5,  ga:7  },
+  'Colombia':           { finish:'1st · Group K', w:2, d:1, l:0, gf:4,  ga:1  },
+  'Portugal':           { finish:'2nd · Group K', w:1, d:2, l:0, gf:6,  ga:1  },
+  'Congo DR':           { finish:'3rd · Group K', w:1, d:1, l:1, gf:4,  ga:3  },
+  'England':            { finish:'1st · Group L', w:2, d:1, l:0, gf:6,  ga:2  },
+  'Croatia':            { finish:'2nd · Group L', w:2, d:0, l:1, gf:5,  ga:5  },
+  'Ghana':              { finish:'3rd · Group L', w:1, d:1, l:1, gf:2,  ga:2  },
+};
+
 // ── Collect all matches and filter to today ───────────────────────────────────
 const allMatches = [
   ...r32Pairs.flatMap(p => p.matches),
@@ -496,6 +558,35 @@ if (todayMatches.length === 0) {
 function buildBlock(m) {
   const t1Tbd = isTbd(m.t1.name);
   const t2Tbd = isTbd(m.t2.name);
+  const s1 = TEAM_STATS[m.t1.name];
+  const s2 = TEAM_STATS[m.t2.name];
+  const tot = (!t1Tbd && !t2Tbd && s1 && s2) ? `
+    <button class="tot-toggle" id="tot-btn-${m.num}">
+      <span>Tale of the Tape</span>
+      <span class="tot-arrow">▼</span>
+    </button>
+    <div class="tot-body" id="tot-${m.num}">
+      <div class="tot-row">
+        <span class="tot-val">${s1.finish}</span>
+        <span class="tot-label">Group Finish</span>
+        <span class="tot-val right">${s2.finish}</span>
+      </div>
+      <div class="tot-row">
+        <span class="tot-val">${s1.gf}</span>
+        <span class="tot-label">Goals Scored</span>
+        <span class="tot-val right">${s2.gf}</span>
+      </div>
+      <div class="tot-row">
+        <span class="tot-val">${s1.ga}</span>
+        <span class="tot-label">Goals Allowed</span>
+        <span class="tot-val right">${s2.ga}</span>
+      </div>
+      <div class="tot-row">
+        <span class="tot-val">${s1.w}-${s1.d}-${s1.l}</span>
+        <span class="tot-label">W-D-L</span>
+        <span class="tot-val right">${s2.w}-${s2.d}-${s2.l}</span>
+      </div>
+    </div>` : '';
   return `
     <div class="pick-tile">
       <div class="pick-header">
@@ -526,6 +617,7 @@ function buildBlock(m) {
           <button class="submit-btn" data-match="${m.num}">Submit Pick</button>
         </div>
       </div>
+      ${tot}
     </div>
     <div class="picks-table-wrap hidden" id="table_${m.num}">
       <table class="picks-table">
@@ -558,6 +650,15 @@ function wireBlock(block, m) {
   [pk1, pk2].forEach(el => el.addEventListener('focus', () => el.select()));
 
   block.querySelector('.submit-btn').addEventListener('click', () => openModal(m, block));
+
+  const totBtn  = block.querySelector(`#tot-btn-${m.num}`);
+  const totBody = block.querySelector(`#tot-${m.num}`);
+  if (totBtn && totBody) {
+    totBtn.addEventListener('click', () => {
+      const open = totBody.classList.toggle('open');
+      totBtn.classList.toggle('open', open);
+    });
+  }
 }
 
 // ── Modal ─────────────────────────────────────────────────────────────────────
