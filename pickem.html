@@ -311,6 +311,26 @@
       .score-row > .team-side.right { grid-column: 3; grid-row: 1; }
       .score-row > input:last-child { grid-column: 3; grid-row: 2; justify-self: end; }
     }
+
+    /* ── Day navigation ── */
+    .day-nav {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 20px 40px; max-width: 680px; margin: 0 auto;
+    }
+    .day-nav-btn {
+      background: rgba(0,0,0,0.25); color: var(--gold);
+      border: 1px solid rgba(232,194,26,0.35); border-radius: 6px;
+      padding: 8px 14px; font-size: 0.8rem; font-weight: 700; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .day-nav-btn:hover { background: rgba(0,0,0,0.4); }
+    .day-nav-select {
+      background: rgba(0,0,0,0.25); color: var(--gold);
+      border: 1px solid rgba(232,194,26,0.35); border-radius: 6px;
+      padding: 8px 12px; font-size: 0.8rem; font-weight: 700;
+      outline: none; cursor: pointer;
+    }
+    .day-nav-select option { background: #003277; color: #fff; }
   </style>
 </head>
 <body>
@@ -356,6 +376,12 @@
       </li>
     </ol>
   </div>
+  <div id="matchesWrap"></div>
+</div>
+
+<div class="day-nav">
+  <button class="day-nav-btn" id="prevDayBtn"></button>
+  <select class="day-nav-select" id="dayPicker"></select>
 </div>
 
 <!-- Name modal -->
@@ -524,36 +550,67 @@ const allMatches = [
 ];
 
 const todayLabel = new Date().toLocaleDateString('en-US', { month:'short', day:'numeric' });
-const todayMatches = allMatches
-  .filter(m => m.date === todayLabel)
-  .sort((a, b) => {
-    const t = s => { const [h,m] = s.split(':'); return parseInt(h)*60+parseInt(m); };
-    return t(a.time) - t(b.time);
-  });
+const todayMs    = new Date(todayLabel + ' 2026').getTime();
+const pastDates  = [...new Set(allMatches.map(m => m.date))]
+  .filter(d => new Date(d + ' 2026').getTime() <= todayMs)
+  .sort((a, b) => new Date(a + ' 2026') - new Date(b + ' 2026'));
 
 // ── Render ────────────────────────────────────────────────────────────────────
-const content = document.getElementById('content');
+const matchesWrap = document.getElementById('matchesWrap');
+const prevDayBtn  = document.getElementById('prevDayBtn');
+const dayPicker   = document.getElementById('dayPicker');
+let viewDate = pastDates.includes(todayLabel) ? todayLabel : (pastDates[pastDates.length - 1] || todayLabel);
+let currentMatches = [];
 
 function isTbd(name) {
   return /^(W|L)\d+$/.test(name) || /^(1st|2nd|3rd)\s/i.test(name);
 }
 
-if (todayMatches.length === 0) {
-  const msg = document.createElement('div');
-  msg.className = 'no-matches';
-  msg.innerHTML = 'No matches scheduled for today.<br>Check back on matchday.';
-  content.appendChild(msg);
-} else {
-  todayMatches.forEach(m => {
-    const block = document.createElement('div');
-    block.className = 'pick-block';
-    block.dataset.matchNum = m.num;
-    block.innerHTML = buildBlock(m);
-    content.appendChild(block);
-    wireBlock(block, m);
+function sortByTime(arr) {
+  return arr.slice().sort((a, b) => {
+    const t = s => { const [h, mn] = s.split(':'); return parseInt(h) * 60 + parseInt(mn); };
+    return t(a.time) - t(b.time);
   });
-  loadSheetPicks();
 }
+
+function renderDay(date) {
+  viewDate = date;
+  currentMatches = sortByTime(allMatches.filter(m => m.date === date));
+  matchesWrap.innerHTML = '';
+
+  if (currentMatches.length === 0) {
+    const msg = document.createElement('div');
+    msg.className = 'no-matches';
+    msg.innerHTML = 'No matches scheduled for this day.<br>Select another date.';
+    matchesWrap.appendChild(msg);
+  } else {
+    currentMatches.forEach(m => {
+      const block = document.createElement('div');
+      block.className = 'pick-block';
+      block.dataset.matchNum = m.num;
+      block.innerHTML = buildBlock(m);
+      matchesWrap.appendChild(block);
+      wireBlock(block, m);
+    });
+    loadSheetPicks();
+  }
+
+  const idx = pastDates.indexOf(date);
+  prevDayBtn.textContent = idx > 0 ? pastDates[idx - 1] : '';
+  prevDayBtn.style.visibility = idx > 0 ? 'visible' : 'hidden';
+
+  dayPicker.innerHTML = pastDates.slice().reverse().map(d =>
+    `<option value="${d}"${d === date ? ' selected' : ''}>${d}</option>`
+  ).join('');
+}
+
+prevDayBtn.addEventListener('click', () => {
+  const idx = pastDates.indexOf(viewDate);
+  if (idx > 0) renderDay(pastDates[idx - 1]);
+});
+dayPicker.addEventListener('change', () => renderDay(dayPicker.value));
+
+renderDay(viewDate);
 
 function buildBlock(m) {
   const t1Tbd = isTbd(m.t1.name);
@@ -773,7 +830,7 @@ async function loadSheetPicks() {
   try {
     const res = await fetch(`${SHEET_URL}?action=read`);
     const all = await res.json();
-    todayMatches.forEach(match => {
+    currentMatches.forEach(match => {
       const picks = all
         .filter(row => String(row['Match #']) === String(match.num))
         .map(row => {
