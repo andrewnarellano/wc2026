@@ -108,6 +108,7 @@
     .score-input::-webkit-inner-spin-button,
     .score-input::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
     .score-input:focus { border-color: var(--gold); background: rgba(232,194,26,0.1); }
+    .score-input:disabled, .pk-input:disabled { opacity: 0.35; cursor: not-allowed; }
 
     .team-side {
       display: flex; align-items: center; gap: 8px;
@@ -170,6 +171,8 @@
       transition: background 0.15s;
     }
     .submit-btn:hover { background: #f5d020; }
+    .submit-btn.locked { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.38); cursor: not-allowed; }
+    .submit-btn.locked:hover { background: rgba(255,255,255,0.1); }
 
     /* ── Picks table ── */
     .picks-table-wrap {
@@ -573,6 +576,23 @@ function sortByTime(arr) {
   });
 }
 
+function parseMatchTime(dateStr, timeStr) {
+  const months = {Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+  const [mon, day] = dateStr.split(' ');
+  const clean = timeStr.replace(' CT', '').trim();
+  const [timePart, ampm] = clean.split(' ');
+  let [hrs, mins] = timePart.split(':').map(Number);
+  if (ampm === 'PM' && hrs !== 12) hrs += 12;
+  if (ampm === 'AM' && hrs === 12) hrs = 0;
+  return new Date(Date.UTC(2026, months[mon], parseInt(day), hrs + 5, mins));
+}
+
+function lockBlock(block) {
+  block.querySelectorAll('.score-input, .pk-input').forEach(el => el.disabled = true);
+  const btn = block.querySelector('.submit-btn');
+  if (btn) { btn.disabled = true; btn.textContent = 'Locked'; btn.classList.add('locked'); }
+}
+
 function renderDay(date) {
   viewDate = date;
   currentMatches = sortByTime(allMatches.filter(m => m.date === date));
@@ -715,6 +735,13 @@ function wireBlock(block, m) {
       const open = totBody.classList.toggle('open');
       totBtn.classList.toggle('open', open);
     });
+  }
+
+  const lockMs = parseMatchTime(m.date, m.time).getTime() - 10 * 60 * 1000;
+  if (Date.now() >= lockMs) {
+    lockBlock(block);
+  } else {
+    setTimeout(() => lockBlock(block), lockMs - Date.now());
   }
 }
 
