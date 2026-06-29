@@ -174,6 +174,11 @@
     .submit-btn.locked { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.38); cursor: not-allowed; }
     .submit-btn.locked:hover { background: rgba(255,255,255,0.1); }
 
+    /* ── Pick deadline label ── */
+    .pick-footer-left { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
+    .pick-deadline { font-size: 0.58rem; font-weight: 600; color: rgba(255,255,255,0.35); }
+    .pick-deadline.closed { color: rgba(255,110,110,0.65); }
+
     /* ── Picks table ── */
     .picks-table-wrap {
       background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden;
@@ -696,7 +701,10 @@ function buildBlock(m) {
           <input class="pk-input" id="pk2_${m.num}" type="number" min="0" max="99">
         </div>
         <div class="pick-footer">
-          <span class="pick-venue">${m.venue}</span>
+          <div class="pick-footer-left">
+            <span class="pick-venue">${m.venue}</span>
+            <span class="pick-deadline" id="deadline_${m.num}"></span>
+          </div>
           <button class="submit-btn" data-match="${m.num}">Submit Pick</button>
         </div>
       </div>
@@ -743,11 +751,24 @@ function wireBlock(block, m) {
     });
   }
 
-  const lockMs = parseMatchTime(m.date, m.time).getTime() - 10 * 60 * 1000;
-  if (Date.now() >= lockMs) {
+  const lockMs  = parseMatchTime(m.date, m.time).getTime() - 10 * 60 * 1000;
+  const lockDate = new Date(lockMs);
+  const closesAt = lockDate.toLocaleTimeString('en-US', {
+    hour: 'numeric', minute: '2-digit', timeZone: 'America/Chicago'
+  }) + ' CT';
+  const deadline = block.querySelector(`#deadline_${m.num}`);
+
+  function applyLock() {
     lockBlock(block);
+    if (deadline) { deadline.textContent = 'Picks closed'; deadline.classList.add('closed'); }
+  }
+
+  if (deadline) deadline.textContent = `Closes ${closesAt}`;
+
+  if (Date.now() >= lockMs) {
+    applyLock();
   } else {
-    setTimeout(() => lockBlock(block), lockMs - Date.now());
+    setTimeout(applyLock, lockMs - Date.now());
   }
 }
 
