@@ -439,6 +439,8 @@ const thirdPlace = {
   t1:{flag:"",name:"L101"}, t2:{flag:"",name:"L102"}, winner:null,score:null
 };
 
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzIThrmTDRv3B3yDjaRMRf_pneLPWyzUb5KjP82Q3Vk1LN2YzrWrrcTWbPL9QIKKorQ/exec';
+
 // ── Collect all matches and filter to today ───────────────────────────────────
 const allMatches = [
   ...r32Pairs.flatMap(p => p.matches),
@@ -636,8 +638,6 @@ document.getElementById('modalLast').addEventListener('keydown', e => {
 });
 
 // ── Table render ──────────────────────────────────────────────────────────────
-const SHEET_URL = 'https://script.google.com/macros/s/AKfycbzIThrmTDRv3B3yDjaRMRf_pneLPWyzUb5KjP82Q3Vk1LN2YzrWrrcTWbPL9QIKKorQ/exec';
-
 function renderTable(matchNum, sheetPicks) {
   const picks = sheetPicks !== undefined
     ? sheetPicks
