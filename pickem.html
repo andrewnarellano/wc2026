@@ -180,16 +180,20 @@
     .pick-deadline.closed { color: rgba(255,110,110,0.65); }
 
     /* ── Final score display ── */
+    .final-result { display: flex; flex-direction: column; gap: 10px; }
+    .final-result-teams { display: flex; align-items: center; }
+    .final-result-teams .team-side { flex: 1; }
+    .final-result-scores { display: flex; align-items: center; justify-content: center; gap: 16px; }
     .final-score-val {
-      width: 54px; height: 46px; border-radius: 7px;
+      width: 62px; height: 52px; border-radius: 7px;
       background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
       display: flex; flex-direction: column; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
     .final-score-val.win { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); }
-    .final-score-main { font-size: 1.15rem; font-weight: 800; line-height: 1; color: #fff; }
+    .final-score-main { font-size: 1.25rem; font-weight: 800; line-height: 1; color: #fff; }
     .final-score-val.win .final-score-main { color: var(--green); }
-    .final-score-pk { font-size: 0.58rem; font-weight: 700; color: rgba(255,255,255,0.45); line-height: 1; margin-top: 3px; }
+    .final-score-pk { font-size: 0.62rem; font-weight: 700; color: rgba(255,255,255,0.45); line-height: 1; margin-top: 3px; }
     .final-score-val.win .final-score-pk { color: rgba(34,197,94,0.7); }
     .team-name-lg.winner-name { color: var(--green); }
     .final-badge {
@@ -703,24 +707,28 @@ function buildBlock(m) {
     const g1 = m.score[0], g2 = m.score[1];
     const pk1 = m.pk ? m.pk[0] : null, pk2 = m.pk ? m.pk[1] : null;
     scoreSection = `
-      <div class="score-row">
-        <span class="final-score-val${w1?' win':''}">
-          <span class="final-score-main">${g1}</span>
-          ${pk1 !== null ? `<span class="final-score-pk">(${pk1})</span>` : ''}
-        </span>
-        <div class="team-side">
-          <span class="team-flag-lg">${m.t1.flag}</span>
-          <span class="team-name-lg${t1Tbd?' tbd-team':''}${w1?' winner-name':''}">${m.t1.name}</span>
+      <div class="final-result">
+        <div class="final-result-teams">
+          <div class="team-side">
+            <span class="team-flag-lg">${m.t1.flag}</span>
+            <span class="team-name-lg${t1Tbd?' tbd-team':''}${w1?' winner-name':''}">${m.t1.name}</span>
+          </div>
+          <div class="team-side right">
+            <span class="team-name-lg${t2Tbd?' tbd-team':''}${w2?' winner-name':''}">${m.t2.name}</span>
+            <span class="team-flag-lg">${m.t2.flag}</span>
+          </div>
         </div>
-        <span class="vs-sep">—</span>
-        <div class="team-side right">
-          <span class="team-name-lg${t2Tbd?' tbd-team':''}${w2?' winner-name':''}">${m.t2.name}</span>
-          <span class="team-flag-lg">${m.t2.flag}</span>
+        <div class="final-result-scores">
+          <span class="final-score-val${w1?' win':''}">
+            <span class="final-score-main">${g1}</span>
+            ${pk1 !== null ? `<span class="final-score-pk">(${pk1})</span>` : ''}
+          </span>
+          <span class="vs-sep">—</span>
+          <span class="final-score-val${w2?' win':''}">
+            <span class="final-score-main">${g2}</span>
+            ${pk2 !== null ? `<span class="final-score-pk">(${pk2})</span>` : ''}
+          </span>
         </div>
-        <span class="final-score-val${w2?' win':''}">
-          <span class="final-score-main">${g2}</span>
-          ${pk2 !== null ? `<span class="final-score-pk">(${pk2})</span>` : ''}
-        </span>
       </div>`;
   } else {
     scoreSection = `
