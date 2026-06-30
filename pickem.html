@@ -179,6 +179,25 @@
     .pick-deadline { font-size: 0.58rem; font-weight: 600; color: rgba(255,255,255,0.35); }
     .pick-deadline.closed { color: rgba(255,110,110,0.65); }
 
+    /* ── Final score display ── */
+    .final-score-val {
+      width: 54px; height: 46px; border-radius: 7px;
+      background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12);
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .final-score-val.win { background: rgba(34,197,94,0.12); border-color: rgba(34,197,94,0.3); }
+    .final-score-main { font-size: 1.15rem; font-weight: 800; line-height: 1; color: #fff; }
+    .final-score-val.win .final-score-main { color: var(--green); }
+    .final-score-pk { font-size: 0.58rem; font-weight: 700; color: rgba(255,255,255,0.45); line-height: 1; margin-top: 3px; }
+    .final-score-val.win .final-score-pk { color: rgba(34,197,94,0.7); }
+    .team-name-lg.winner-name { color: var(--green); }
+    .final-badge {
+      background: rgba(255,255,255,0.07); color: rgba(255,255,255,0.32);
+      padding: 9px 20px; border-radius: 6px; font-weight: 800; font-size: 0.72rem;
+      letter-spacing: 0.8px; white-space: nowrap; flex-shrink: 0;
+    }
+
     /* ── Picks table ── */
     .picks-table-wrap {
       background: rgba(0,0,0,0.2); border-radius: 8px; overflow: hidden;
@@ -675,6 +694,56 @@ function buildBlock(m) {
         <span class="tot-val right">${s2.w}-${s2.d}-${s2.l}</span>
       </div>
     </div>` : '';
+
+  const isFinal = m.winner !== null && m.score !== null;
+  const w1 = m.winner === 0, w2 = m.winner === 1;
+
+  let scoreSection;
+  if (isFinal) {
+    const g1 = m.score[0], g2 = m.score[1];
+    const pk1 = m.pk ? m.pk[0] : null, pk2 = m.pk ? m.pk[1] : null;
+    scoreSection = `
+      <div class="score-row">
+        <span class="final-score-val${w1?' win':''}">
+          <span class="final-score-main">${g1}</span>
+          ${pk1 !== null ? `<span class="final-score-pk">(${pk1})</span>` : ''}
+        </span>
+        <div class="team-side">
+          <span class="team-flag-lg">${m.t1.flag}</span>
+          <span class="team-name-lg${t1Tbd?' tbd-team':''}${w1?' winner-name':''}">${m.t1.name}</span>
+        </div>
+        <span class="vs-sep">—</span>
+        <div class="team-side right">
+          <span class="team-name-lg${t2Tbd?' tbd-team':''}${w2?' winner-name':''}">${m.t2.name}</span>
+          <span class="team-flag-lg">${m.t2.flag}</span>
+        </div>
+        <span class="final-score-val${w2?' win':''}">
+          <span class="final-score-main">${g2}</span>
+          ${pk2 !== null ? `<span class="final-score-pk">(${pk2})</span>` : ''}
+        </span>
+      </div>`;
+  } else {
+    scoreSection = `
+      <div class="score-row">
+        <input class="score-input" id="s1_${m.num}" type="number" min="0" max="99">
+        <div class="team-side">
+          <span class="team-flag-lg">${m.t1.flag}</span>
+          <span class="team-name-lg${t1Tbd?' tbd-team':''}">${m.t1.name}</span>
+        </div>
+        <span class="vs-sep">VS</span>
+        <div class="team-side right">
+          <span class="team-name-lg${t2Tbd?' tbd-team':''}">${m.t2.name}</span>
+          <span class="team-flag-lg">${m.t2.flag}</span>
+        </div>
+        <input class="score-input" id="s2_${m.num}" type="number" min="0" max="99">
+      </div>
+      <div class="pk-row" id="pkrow_${m.num}">
+        <input class="pk-input" id="pk1_${m.num}" type="number" min="0" max="99">
+        <span class="pk-label">Penalty Kicks</span>
+        <input class="pk-input" id="pk2_${m.num}" type="number" min="0" max="99">
+      </div>`;
+  }
+
   return `
     <div class="pick-tile">
       <div class="pick-header">
@@ -682,30 +751,13 @@ function buildBlock(m) {
         <span class="pick-match-dt">${m.date} &middot; ${m.time}</span>
       </div>
       <div class="pick-body">
-        <div class="score-row">
-          <input class="score-input" id="s1_${m.num}" type="number" min="0" max="99">
-          <div class="team-side">
-            <span class="team-flag-lg">${m.t1.flag}</span>
-            <span class="team-name-lg${t1Tbd?' tbd-team':''}">${m.t1.name}</span>
-          </div>
-          <span class="vs-sep">VS</span>
-          <div class="team-side right">
-            <span class="team-name-lg${t2Tbd?' tbd-team':''}">${m.t2.name}</span>
-            <span class="team-flag-lg">${m.t2.flag}</span>
-          </div>
-          <input class="score-input" id="s2_${m.num}" type="number" min="0" max="99">
-        </div>
-        <div class="pk-row" id="pkrow_${m.num}">
-          <input class="pk-input" id="pk1_${m.num}" type="number" min="0" max="99">
-          <span class="pk-label">Penalty Kicks</span>
-          <input class="pk-input" id="pk2_${m.num}" type="number" min="0" max="99">
-        </div>
+        ${scoreSection}
         <div class="pick-footer">
           <div class="pick-footer-left">
             <span class="pick-venue">${m.venue}</span>
             <span class="pick-deadline" id="deadline_${m.num}"></span>
           </div>
-          <button class="submit-btn" data-match="${m.num}">Submit Pick</button>
+          ${isFinal ? '<span class="final-badge">FINAL</span>' : `<button class="submit-btn" data-match="${m.num}">Submit Pick</button>`}
         </div>
       </div>
       ${tot}
@@ -721,26 +773,29 @@ function buildBlock(m) {
 }
 
 function wireBlock(block, m) {
-  const s1    = block.querySelector(`#s1_${m.num}`);
-  const s2    = block.querySelector(`#s2_${m.num}`);
-  const pkRow = block.querySelector(`#pkrow_${m.num}`);
+  const isFinal = m.winner !== null && m.score !== null;
 
-  function checkDraw() {
-    const v1 = s1.value.trim(), v2 = s2.value.trim();
-    const isDraw = v1 !== '' && v2 !== '' && v1 === v2;
-    pkRow.classList.toggle('visible', isDraw);
+  if (!isFinal) {
+    const s1    = block.querySelector(`#s1_${m.num}`);
+    const s2    = block.querySelector(`#s2_${m.num}`);
+    const pkRow = block.querySelector(`#pkrow_${m.num}`);
+
+    function checkDraw() {
+      const v1 = s1.value.trim(), v2 = s2.value.trim();
+      const isDraw = v1 !== '' && v2 !== '' && v1 === v2;
+      pkRow.classList.toggle('visible', isDraw);
+    }
+
+    s1.addEventListener('input', checkDraw);
+    s2.addEventListener('input', checkDraw);
+    [s1, s2].forEach(el => el.addEventListener('focus', () => el.select()));
+
+    const pk1 = block.querySelector(`#pk1_${m.num}`);
+    const pk2 = block.querySelector(`#pk2_${m.num}`);
+    [pk1, pk2].forEach(el => el.addEventListener('focus', () => el.select()));
+
+    block.querySelector('.submit-btn').addEventListener('click', () => openModal(m, block));
   }
-
-  s1.addEventListener('input', checkDraw);
-  s2.addEventListener('input', checkDraw);
-
-  [s1, s2].forEach(el => el.addEventListener('focus', () => el.select()));
-
-  const pk1 = block.querySelector(`#pk1_${m.num}`);
-  const pk2 = block.querySelector(`#pk2_${m.num}`);
-  [pk1, pk2].forEach(el => el.addEventListener('focus', () => el.select()));
-
-  block.querySelector('.submit-btn').addEventListener('click', () => openModal(m, block));
 
   const totBtn  = block.querySelector(`#tot-btn-${m.num}`);
   const totBody = block.querySelector(`#tot-${m.num}`);
