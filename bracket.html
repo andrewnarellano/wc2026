@@ -244,6 +244,41 @@
       font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.38);
       letter-spacing: 0.8px; text-align: center; padding: 4px 0 2px;
     }
+
+    /* ── Mobile portrait: round-tab navigation ── */
+    #mobile-bracket { display: none; }
+
+    @media (max-width: 900px) and (orientation: portrait) {
+      .bracket-scroll, .scroll-hint { display: none !important; }
+      #mobile-bracket { display: block; padding: 12px 12px 48px; }
+
+      .round-labels-inner { padding: 0; }
+      .rl-item {
+        flex: 1; width: auto; min-width: 0;
+        margin-left: 0 !important;
+        cursor: pointer; -webkit-tap-highlight-color: transparent;
+        font-size: 0.65rem; letter-spacing: 0.5px; padding: 0 4px;
+        color: rgba(255,255,255,0.45);
+        border-bottom: 2px solid transparent;
+        transition: color 0.15s, border-color 0.15s;
+        white-space: nowrap;
+      }
+      .rl-item.mob-active { color: var(--gold); border-bottom-color: var(--gold); }
+
+      .mobile-round-list { display: flex; flex-direction: column; gap: 10px; }
+      .mobile-round-list .match { width: 100%; }
+      .mobile-round-list .match::after { display: none; }
+      .mobile-third-label {
+        font-size: 0.6rem; font-weight: 800; color: rgba(255,255,255,0.38);
+        letter-spacing: 0.8px; text-align: center; padding: 6px 0 2px;
+      }
+
+      @keyframes mobRoundIn {
+        from { transform: scale(0.93); opacity: 0; }
+        to   { transform: scale(1);    opacity: 1; }
+      }
+      .mob-zoom-in { animation: mobRoundIn 0.22s cubic-bezier(0.22,1,0.36,1) both; }
+    }
   </style>
 </head>
 <body>
@@ -285,6 +320,7 @@
 <div class="bracket-scroll">
   <div class="bracket-wrap" id="bw"></div>
 </div>
+<div id="mobile-bracket"></div>
 
 <script>
 // Times shown in CT (ET − 1 hr)
@@ -477,6 +513,67 @@ document.getElementById('hamburger').addEventListener('click', function(e) {
 document.addEventListener('click', () => {
   document.getElementById('navDropdown').classList.remove('open');
 });
+
+// ── Mobile portrait: round-tab navigation ──────────────────────────────────
+(function() {
+  const _mq = window.matchMedia('(max-width: 900px) and (orientation: portrait)');
+  const mobileRounds = [
+    { short: 'R32',   matches: r32Pairs.flatMap(p => p.matches) },
+    { short: 'R16',   matches: r16 },
+    { short: 'QF',    matches: qf },
+    { short: 'SF',    matches: sf },
+    { short: 'Final', matches: [finalMatch, thirdPlace], hasFinal: true },
+  ];
+  const fullLabels = ['Round of 32','Round of 16','Quarterfinals','Semifinals','Final'];
+
+  let activeIdx = 0;
+  for (let i = 0; i < mobileRounds.length; i++) {
+    if (mobileRounds[i].matches.every(m => m.winner !== null)) activeIdx = i;
+  }
+
+  const _mob  = document.getElementById('mobile-bracket');
+  const _tabs = Array.from(document.querySelectorAll('.rl-item'));
+
+  function renderRound(idx, animate) {
+    const rnd = mobileRounds[idx];
+    let inner = `<div class="mobile-round-list${animate ? ' mob-zoom-in' : ''}">`;
+    if (rnd.hasFinal) {
+      inner += matchCard(finalMatch);
+      inner += '<div class="mobile-third-label">3RD PLACE</div>';
+      inner += matchCard(thirdPlace);
+    } else {
+      inner += rnd.matches.map(matchCard).join('');
+    }
+    inner += '</div>';
+    _mob.innerHTML = inner;
+  }
+
+  function selectRound(idx, animate) {
+    activeIdx = idx;
+    _tabs.forEach((el, i) => el.classList.toggle('mob-active', i === idx));
+    renderRound(idx, animate);
+  }
+
+  function applyMobileMode() {
+    _tabs.forEach((el, i) => { el.textContent = mobileRounds[i].short; });
+    selectRound(activeIdx, false);
+  }
+
+  function applyDesktopMode() {
+    _tabs.forEach((el, i) => { el.textContent = fullLabels[i]; el.classList.remove('mob-active'); });
+    _mob.innerHTML = '';
+  }
+
+  _tabs.forEach((el, i) => {
+    el.addEventListener('click', () => {
+      if (!_mq.matches || i === activeIdx) return;
+      selectRound(i, true);
+    });
+  });
+
+  if (_mq.matches) applyMobileMode();
+  _mq.addEventListener('change', e => { if (e.matches) applyMobileMode(); else applyDesktopMode(); });
+})();
 </script>
 </body>
 </html>
